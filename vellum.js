@@ -427,6 +427,10 @@
   let onReset = null;
   let onModeChange = null;
   let currentMode = "always-on";
+  let lastCount = 0;
+  let copyMdBtn = null;
+  let copyJsonBtn = null;
+  let resetBtnRef = null;
 
   const STYLES = `
     :host { all: initial; }
@@ -445,17 +449,48 @@
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 5px; padding: 4px 8px;
       cursor: pointer;
+      transition: background 120ms ease, opacity 120ms ease;
     }
     .panel button:hover { background: rgba(255,255,255,0.16); }
+    .panel button:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+    .panel button:active:not(:disabled) {
+      background: rgba(255,255,255,0.24);
+    }
+    .panel button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
     .count {
       background: rgba(255,255,255,0.12);
       border-radius: 999px; padding: 2px 8px;
+    }
+    .count.pulse {
+      animation: vellum-pulse 320ms ease-out;
+    }
+    @keyframes vellum-pulse {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.12); }
+      100% { transform: scale(1); }
     }
     .badge-warn {
       background: #b45309; padding: 2px 6px; border-radius: 4px;
       font-size: 11px;
     }
   `;
+
+  async function withCopyFeedback(btn, fn) {
+    const original = btn.textContent;
+    try {
+      await fn();
+      btn.textContent = "Copied ✓";
+    } catch (e) {
+      btn.textContent = "Failed";
+    }
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  }
 
   function mount(opts) {
     onCopyMd = opts.onCopyMarkdown;
@@ -474,26 +509,34 @@
 
     const panel = document.createElement("div");
     panel.className = "panel";
+    panel.setAttribute("role", "toolbar");
+    panel.setAttribute("aria-label", "Vellum editing toolbar");
 
     countEl = document.createElement("span");
     countEl.className = "count";
     countEl.textContent = "0 edits";
     panel.appendChild(countEl);
 
-    const copyMd = document.createElement("button");
-    copyMd.textContent = "Copy markdown";
-    copyMd.addEventListener("click", () => onCopyMd?.());
-    panel.appendChild(copyMd);
+    copyMdBtn = document.createElement("button");
+    copyMdBtn.textContent = "Copy markdown";
+    copyMdBtn.addEventListener("click", () => withCopyFeedback(copyMdBtn, () => onCopyMd?.()));
+    panel.appendChild(copyMdBtn);
 
-    const copyJson = document.createElement("button");
-    copyJson.textContent = "Copy JSON";
-    copyJson.addEventListener("click", () => onCopyJson?.());
-    panel.appendChild(copyJson);
+    copyJsonBtn = document.createElement("button");
+    copyJsonBtn.textContent = "Copy JSON";
+    copyJsonBtn.addEventListener("click", () => withCopyFeedback(copyJsonBtn, () => onCopyJson?.()));
+    panel.appendChild(copyJsonBtn);
 
-    const resetBtn = document.createElement("button");
-    resetBtn.textContent = "Reset";
-    resetBtn.addEventListener("click", () => onReset?.());
-    panel.appendChild(resetBtn);
+    resetBtnRef = document.createElement("button");
+    resetBtnRef.textContent = "Reset";
+    resetBtnRef.addEventListener("click", () => {
+      onReset?.();
+      if (countEl) {
+        countEl.textContent = "Restored";
+        setTimeout(() => flash(lastCount), 1200);
+      }
+    });
+    panel.appendChild(resetBtnRef);
 
     modeBtn = document.createElement("button");
     modeBtn.textContent = currentMode === "always-on" ? "Mode: always-on" : "Mode: click-to-arm";
@@ -511,7 +554,17 @@
   }
 
   function flash(count) {
-    if (countEl) countEl.textContent = `${count} edit${count === 1 ? "" : "s"}`;
+    lastCount = count;
+    if (countEl) {
+      countEl.textContent = `${count} edit${count === 1 ? "" : "s"}`;
+      countEl.classList.remove("pulse");
+      void countEl.offsetWidth;
+      countEl.classList.add("pulse");
+    }
+    const empty = count === 0;
+    [copyMdBtn, copyJsonBtn, resetBtnRef].forEach(btn => {
+      if (btn) btn.disabled = empty;
+    });
   }
 
   function showStorageBadge() {
