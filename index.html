@@ -431,7 +431,7 @@
       const line = new LeaderLine(a, b, Object.assign({
         color: ink,
         size: 2,
-        path: 'fluid',
+        path: 'straight',
         startSocket: 'bottom',
         endSocket: 'top',
         startPlug: 'behind',
@@ -446,7 +446,6 @@
     function buildLines() {
       // Stack mapping — straight horizontal connectors, no arrowheads
       const stackOpts = {
-        path: 'straight',
         startSocket: 'right',
         endSocket: 'left',
         endPlug: 'behind',
@@ -456,35 +455,26 @@
       connect('pp-compliance', 'ent-gov', stackOpts);
       connect('pp-data', 'ent-data', stackOpts);
 
-      // Knowledge graph — Compass branches
+      // Knowledge graph — straight node-style connectors
       connect('kg-compass', 'kg-intake', {
-        startSocketGravity: [0, 80],
-        endSocketGravity: [0, -80],
         middleLabel: LeaderLine.captionLabel('past bij PP', { color: mute, fontSize: 13, offset: [16, 0] }),
       });
       connect('kg-compass', 'kg-offramp', {
-        startSocketGravity: [0, 80],
-        endSocketGravity: [0, -80],
         middleLabel: LeaderLine.captionLabel('past niet bij PP', { color: mute, fontSize: 13, offset: [16, 0] }),
       });
 
-      // Vertical flow
       connect('kg-intake', 'kg-refinery');
       connect('kg-refinery', 'kg-validator-pre');
       connect('kg-validator-pre', 'kg-foundry');
       connect('kg-foundry', 'kg-prod');
 
-      // Split from prod → meting + loop (S-curves)
-      connect('kg-prod', 'kg-meting', { startSocketGravity: [0, 80] });
-      connect('kg-prod', 'kg-loop', { startSocketGravity: [0, 80] });
+      connect('kg-prod', 'kg-meting');
+      connect('kg-prod', 'kg-loop');
 
-      // Merge → KPI
-      connect('kg-meting', 'kg-kpi', { endSocketGravity: [0, -80] });
-      connect('kg-loop', 'kg-kpi', { endSocketGravity: [0, -80] });
+      connect('kg-meting', 'kg-kpi');
+      connect('kg-loop', 'kg-kpi');
 
-      // Dashed → impact
       connect('kg-kpi', 'kg-impact', {
-        path: 'straight',
         dash: { len: 6, gap: 4, animation: false },
       });
     }
