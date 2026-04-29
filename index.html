@@ -115,7 +115,25 @@
       grid-template-columns: 1fr 1fr;
       column-gap: 36px;
       row-gap: 64px;
+      position: relative;
     }
+    .graph-tag {
+      position: absolute;
+      background: var(--ink);
+      color: #EDEDEB;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 5;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .graph-tag.is-visible { opacity: 1; }
     .g-box {
       border: 2px solid var(--ink);
       border-radius: 10px;
@@ -307,49 +325,51 @@
         <span class="eyebrow" contenteditable="true">03 PP Engagement journey</span>
       </header>
       <div class="graph">
+        <span class="graph-tag" data-source="kg-compass" data-target="kg-intake" contenteditable="true">past bij PP</span>
+        <span class="graph-tag" data-source="kg-compass" data-target="kg-offramp" contenteditable="true">past niet bij PP</span>
         <div class="g-box full" id="kg-compass">
           <h4 contenteditable="true">Pre-Intake</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">60-90 minuten met een PP-partner waarin we bepalen of dit bij ons past en welke modaliteit.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">Past de klant bij ons? 60-90 minuten met een PP-partner.</p>
         </div>
         <div class="g-box" id="kg-intake">
           <h4 contenteditable="true">Intake</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">Het gekozen probleem en de bedrijfscontext volledig begrijpen. We documenteren het werkelijke proces met mensen, compliance en systemen, machine-readable.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">Het probleem en de bedrijfscontext volledig begrijpen.</p>
         </div>
         <div class="g-box dashed" id="kg-offramp">
           <h4 contenteditable="true">Off-ramp</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">Klant past niet bij ons. Externe partner neemt over. PP krijgt X% referral-fee en stapt eruit.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">Past niet. Externe partner neemt over, PP krijgt X% en stapt eruit.</p>
         </div>
         <div class="g-box full" id="kg-refinery">
           <h4 contenteditable="true">Refinery</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">Detailleerde requirements vertalen naar een agent-spec. Drie verplichte checkpoints (Agentic, Venture, Build) en een partner-briefing-pakket van zes documenten.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">Requirements vertalen naar agent-spec. Drie checkpoints, zes documenten.</p>
         </div>
         <div class="g-box full" id="kg-validator-pre">
           <h4 contenteditable="true">Validator (vooraf)</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">Bewijzen dat het werkt voordat we bouwen. Twee weken handmatig met consumer-AI. Impact moet minstens tien keer de bouwkosten zijn.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">Twee weken handmatig bewijzen voordat we bouwen.</p>
         </div>
         <div class="g-box full dark" id="kg-foundry">
           <h4 contenteditable="true">Foundry</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">De PP MKB Stack als doorlopend productie-platform. Skin-in-the-game economie, geen vaste prijs ooit. Schaal komt uit de stack zelf.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">PP MKB Stack als doorlopend productie-platform. Skin-in-the-game, nooit vaste prijs.</p>
         </div>
         <div class="g-box g-center" id="kg-prod">
           <h4 contenteditable="true">Tool / Product Live</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">Systeem in productie met named owner en eval-set. Zestig dagen productie-eis voordat we het succes verklaren.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">In productie met owner en eval-set. Zestig dagen voordat we succes claimen.</p>
         </div>
         <div class="g-box" id="kg-meting">
           <h4 contenteditable="true">Productie-meting</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">Operationele metrics doorlopend in beeld. Response-tijd, foutpercentage en kosten real-time zichtbaar in het dashboard.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">Operationele metrics real-time in het dashboard.</p>
         </div>
         <div class="g-box" id="kg-loop">
           <h4 contenteditable="true">Validator-loop</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">Business metrics na productie. Impact in euro's, hit-rate en doorlooptijd vergeleken met de Validator-projectie vooraf.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">Business metrics na productie. Werkelijke impact versus de projectie vooraf.</p>
         </div>
         <div class="g-box g-center" id="kg-kpi">
           <h4 contenteditable="true">KPI-dashboard</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">Drie views op één meet-laag. DGA, Champion en PP-portfolio zien elk wat voor hen relevant is.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">Drie views: DGA, Champion, PP-portfolio.</p>
         </div>
         <div class="g-box g-center" id="kg-impact">
           <h4 contenteditable="true">Business impact</h4>
-          <p class="lede" style="margin-bottom:0" contenteditable="true">Meer gemeten impact bij de klant betekent meer waarde voor PP. We winnen alleen als de klant aantoonbaar wint.</p>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">Meer impact bij klant, meer waarde voor PP. We winnen alleen als jij wint.</p>
         </div>
       </div>
     </article>
@@ -375,12 +395,12 @@
     const lines = [];
 
     /* ============ EDIT PERSISTENCE ============ */
-    const STORAGE_KEY = 'blueprint-edits-v5';
+    const STORAGE_KEY = 'blueprint-edits-v6';
 
     function loadEdits() {
       try {
         // One-time cleanup of older keys that pre-date the structural change
-        ['blueprint-edits-v1', 'blueprint-edits-v2', 'blueprint-edits-v3', 'blueprint-edits-v4'].forEach(k => localStorage.removeItem(k));
+        ['blueprint-edits-v1', 'blueprint-edits-v2', 'blueprint-edits-v3', 'blueprint-edits-v4', 'blueprint-edits-v5'].forEach(k => localStorage.removeItem(k));
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         const saved = JSON.parse(raw);
@@ -434,20 +454,8 @@
       connect('pp-data', 'ent-data', stackOpts);
 
       // Knowledge graph — sitemap-style threading
-      const labelOpts = {
-        color: mute,
-        fontSize: 13,
-        fontWeight: 500,
-        outlineColor: '#EDEDEB',
-        lineOffset: 0,
-        offset: [0, 0],
-      };
-      connect('kg-compass', 'kg-intake', {
-        middleLabel: LeaderLine.captionLabel('past bij PP', labelOpts),
-      });
-      connect('kg-compass', 'kg-offramp', {
-        middleLabel: LeaderLine.captionLabel('past niet bij PP', labelOpts),
-      });
+      connect('kg-compass', 'kg-intake');
+      connect('kg-compass', 'kg-offramp');
 
       connect('kg-intake', 'kg-refinery');
       connect('kg-refinery', 'kg-validator-pre');
@@ -467,6 +475,28 @@
 
     function repositionAll() {
       lines.forEach(l => { try { l.position(); } catch(e) {} });
+      positionTags();
+    }
+
+    function positionTags() {
+      const graph = document.querySelector('.graph');
+      if (!graph) return;
+      const gRect = graph.getBoundingClientRect();
+      document.querySelectorAll('.graph-tag').forEach(tag => {
+        const source = document.getElementById(tag.dataset.source);
+        const target = document.getElementById(tag.dataset.target);
+        if (!source || !target) return;
+        const sRect = source.getBoundingClientRect();
+        const tRect = target.getBoundingClientRect();
+        // Sit on the horizontal segment of the L-path: midway in the gap
+        // between source bottom and target top, at x = midpoint of the
+        // source-target column centerlines.
+        const x = ((sRect.left + sRect.width / 2) + (tRect.left + tRect.width / 2)) / 2 - gRect.left;
+        const y = (sRect.bottom + tRect.top) / 2 - gRect.top;
+        tag.style.left = x + 'px';
+        tag.style.top = y + 'px';
+        tag.classList.add('is-visible');
+      });
     }
 
     let resizeTimer;
