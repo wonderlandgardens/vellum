@@ -189,6 +189,10 @@
   let onEditCallback = null;
   let toolbarHostRef = null;
   let mode = "always-on";
+  let mouseoverHandler = null;
+  let mouseoutHandler = null;
+  let clickHandler = null;
+  let stylesInjected = false;
 
   function isInsideExcluded(el) {
     let cur = el;
@@ -246,10 +250,68 @@
     if (isEditable(el)) armElement(el);
   }
 
+  function injectHoverStyles() {
+    if (stylesInjected) return;
+    if (document.getElementById("vellum-hover-styles")) { stylesInjected = true; return; }
+    const s = document.createElement("style");
+    s.id = "vellum-hover-styles";
+    s.textContent = `[data-vellum-hover] { outline: 2px dashed #b45309 !important; outline-offset: 2px !important; cursor: pointer !important; }`;
+    document.head.appendChild(s);
+    stylesInjected = true;
+  }
+
+  function findEditableAncestor(el) {
+    let cur = el;
+    while (cur && cur !== document.body) {
+      if (cur === toolbarHostRef) return null;
+      if (isEditable(cur) && !cur.hasAttribute(ARM_MARKER)) return cur;
+      cur = cur.parentElement;
+    }
+    return null;
+  }
+
+  function installClickToArmListeners() {
+    injectHoverStyles();
+    mouseoverHandler = (ev) => {
+      const candidate = findEditableAncestor(ev.target);
+      if (candidate) candidate.setAttribute("data-vellum-hover", "");
+    };
+    mouseoutHandler = (ev) => {
+      if (ev.target.removeAttribute) ev.target.removeAttribute("data-vellum-hover");
+    };
+    clickHandler = (ev) => {
+      const candidate = findEditableAncestor(ev.target);
+      if (!candidate) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      candidate.removeAttribute("data-vellum-hover");
+      armElement(candidate);
+      candidate.focus();
+    };
+    document.addEventListener("mouseover", mouseoverHandler, true);
+    document.addEventListener("mouseout", mouseoutHandler, true);
+    document.addEventListener("click", clickHandler, true);
+  }
+
+  function removeClickToArmListeners() {
+    if (mouseoverHandler) document.removeEventListener("mouseover", mouseoverHandler, true);
+    if (mouseoutHandler) document.removeEventListener("mouseout", mouseoutHandler, true);
+    if (clickHandler) document.removeEventListener("click", clickHandler, true);
+    mouseoverHandler = null;
+    mouseoutHandler = null;
+    clickHandler = null;
+    document.querySelectorAll("[data-vellum-hover]").forEach(el => el.removeAttribute("data-vellum-hover"));
+  }
+
   function setMode(newMode) {
     mode = newMode;
-    if (mode === "always-on") armAll();
-    else disarmAll();
+    if (mode === "always-on") {
+      removeClickToArmListeners();
+      armAll();
+    } else {
+      disarmAll();
+      installClickToArmListeners();
+    }
   }
 
   function getOriginalHTML(el) {
@@ -282,12 +344,17 @@
     });
     mutationObserver.observe(document.body, { childList: true, subtree: true });
 
-    armAll();
+    if (mode === "click-to-arm") {
+      installClickToArmListeners();
+    } else {
+      armAll();
+    }
   }
 
   function destroy() {
     if (inputHandler) document.removeEventListener("input", inputHandler, true);
     if (mutationObserver) mutationObserver.disconnect();
+    removeClickToArmListeners();
     disarmAll();
     inputHandler = null;
     mutationObserver = null;
