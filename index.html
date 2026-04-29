@@ -7,9 +7,8 @@
   <style>
     :root {
       --ink: #111;
-      --soft: #6e6e6e;
+      --soft: #888;
       --border: #e6e6e4;
-      --accent: #b45309;
       --bg: #fff;
     }
     * { box-sizing: border-box; }
@@ -17,108 +16,89 @@
     body {
       background: var(--bg);
       color: var(--ink);
-      font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
       -webkit-font-smoothing: antialiased;
     }
-    main { max-width: 720px; margin: 0 auto; padding: 0 24px 80px; }
+    main { max-width: 640px; margin: 0 auto; padding: 0 24px 80px; }
 
     /* ── Section rhythm ── */
     section {
-      border-top: 1px solid var(--border);
-      padding-top: 64px;
-      margin-top: 64px;
+      padding-top: 48px;
+      margin-top: 0;
     }
 
     /* ── Hero ── */
     .hero {
-      padding-top: 80px;
-      border-top: none;
-      margin-top: 0;
-    }
-    .hero-eyebrow {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin: 0 0 16px;
+      padding-top: 72px;
     }
     .hero h1 {
-      font-size: 56px;
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
+      font-size: 36px;
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: 0;
       margin: 0 0 20px;
     }
     .hero-sub {
-      font-size: 18px;
-      color: var(--soft);
-      margin: 0 0 36px;
-      max-width: 580px;
-    }
-    .hero-install {
-      display: inline-block;
-      background: var(--ink);
-      color: #fff;
-      font-family: ui-monospace, "SF Mono", "Fira Code", monospace;
       font-size: 17px;
-      padding: 16px 20px;
-      border-radius: 8px;
-      letter-spacing: 0.01em;
+      color: #444;
+      margin: 0 0 28px;
     }
 
     /* ── Section headings ── */
     h2 {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      margin: 0 0 24px;
+      font-size: 19px;
+      font-weight: 600;
+      margin: 48px 0 12px;
     }
+    section.hero h2 { margin-top: 0; }
 
     /* ── Lists ── */
     ol, ul {
-      padding-left: 1.4em;
-      margin: 0 0 16px;
+      padding-left: 1.2em;
+      margin: 0 0 14px;
     }
     ol li, ul li {
       line-height: 1.55;
-      margin-bottom: 10px;
-    }
-    ol li::marker, ul li::marker {
-      color: var(--soft);
+      margin-bottom: 6px;
     }
 
     /* ── Paragraphs ── */
-    p { margin: 0 0 16px; }
+    p { margin: 0 0 14px; }
 
     /* ── Blockquote ── */
     blockquote {
-      border-left: 3px solid var(--accent);
-      padding-left: 16px;
-      color: var(--soft);
-      font-style: italic;
-      margin: 0 0 16px;
+      border-left: 2px solid #d6d6d4;
+      padding-left: 14px;
+      color: #444;
+      font-style: normal;
+      margin: 0 0 14px;
     }
 
     /* ── Code / pre ── */
     code {
       font-family: ui-monospace, "SF Mono", "Fira Code", monospace;
-      background: #f5f5f4;
+      background: #f3f3f1;
       padding: 1px 5px;
       border-radius: 3px;
-      font-size: 0.9em;
+      font-size: 0.92em;
     }
     pre {
-      background: #f5f5f4;
+      background: #f5f5f3;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 18px;
+      border-radius: 6px;
+      padding: 12px 14px;
       overflow-x: auto;
       font-family: ui-monospace, "SF Mono", "Fira Code", monospace;
       font-size: 13px;
       line-height: 1.6;
-      margin: 0 0 16px;
+      margin: 0 0 14px;
       color: var(--ink);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      border-radius: 0;
+      font-size: inherit;
     }
 
     /* ── Snippet labels ── */
@@ -133,10 +113,7 @@
     .snippet-group { margin-bottom: 28px; }
 
     /* ── Try it section ── */
-    .try {
-      background: #fafaf9;
-    }
-    .try-intro { color: var(--soft); margin-bottom: 28px; }
+    .try-intro { color: #444; margin-bottom: 20px; }
     .try-content { display: flex; flex-direction: column; gap: 20px; }
     .try-content h3 { margin: 0; font-size: 20px; font-weight: 600; }
     .try-content p { margin: 0; }
@@ -145,9 +122,9 @@
     /* ── Buttons ── */
     .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .btn-primary, .btn-secondary, .btn-tertiary {
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 13px;
       font-family: inherit;
       cursor: pointer;
       line-height: 1;
@@ -174,23 +151,22 @@
 
     /* ── Card ── */
     .card {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
+      border: 1px solid #e6e6e4;
+      border-radius: 6px;
+      padding: 16px 18px;
     }
     .card h4 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
     .card p { margin: 0; color: var(--soft); }
 
     /* ── Footer ── */
     footer {
-      border-top: 1px solid var(--border);
-      margin-top: 80px;
-      padding: 24px 24px 40px;
-      max-width: 720px;
+      margin-top: 64px;
+      padding: 0 24px 32px;
+      max-width: 640px;
       margin-left: auto;
       margin-right: auto;
       color: var(--soft);
-      font-size: 14px;
+      font-size: 13px;
     }
   </style>
 </head>
@@ -199,10 +175,9 @@
 
     <!-- ── 1. Hero ── -->
     <section class="hero">
-      <p class="hero-eyebrow">Vellum</p>
       <h1>Edit any page. Hand the changes to your agent.</h1>
       <p class="hero-sub">Vellum is a drop-in overlay that turns every text node on a page into agent-ready markdown. Click. Edit. Copy. Paste.</p>
-      <div class="hero-install">npm i vellum</div>
+      <pre data-vellum-ignore><code>npm i vellum</code></pre>
     </section>
 
     <!-- ── 2. How you use it ── -->
