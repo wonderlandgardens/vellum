@@ -1,11 +1,29 @@
 {
-  "name": "vellum-dev",
-  "version": "0.0.0",
-  "private": true,
+  "name": "vellum",
+  "version": "1.0.0",
+  "description": "Drop-in editable-text overlay with agent-ready markdown output",
   "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "vellum.js",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "node --test vellum.test.js"
   },
+  "keywords": [
+    "ai-agents",
+    "feedback",
+    "contenteditable",
+    "overlay"
+  ],
+  "license": "MIT",
+  "repository": "<owner>/vellum",
   "devDependencies": {
     "jsdom": "^24.0.0"
   }
