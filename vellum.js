@@ -2,7 +2,7 @@
  * https://github.com/wonderlandgardens/vellum
  */
 (() => {
-  const VERSION = "1.0.1";
+  const VERSION = "1.0.2";
 
   // Internal modules — populated by subsequent tasks.
   const Selector = (() => {
@@ -701,7 +701,6 @@
   }
 
   function reset() {
-    if (!window.confirm("Reset all edits to original?")) return;
     for (const { path, before } of Snapshot.all()) {
       let live = null;
       try { live = document.querySelector(path); } catch (e) {}
