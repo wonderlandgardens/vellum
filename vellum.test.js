@@ -39,3 +39,92 @@ test("vellum loads without throwing and exposes test internals", (t) => {
   assert.ok(internals.Storage);
   assert.ok(internals.Output);
 });
+
+test("pathOf returns id-anchored path when ancestor has id", (t) => {
+  const html = `<!doctype html><html><body>
+    <main id="root"><section><h1>Hi</h1></section></main>
+  </body></html>`;
+  const { internals, document } = loadVellum(t, html);
+  const h1 = document.querySelector("h1");
+  assert.equal(internals.Selector.pathOf(h1), "#root > section > h1");
+});
+
+test("pathOf prefers meaningful class over tag", (t) => {
+  const html = `<!doctype html><html><body>
+    <main><div class="hero card"><p>Hi</p></div></main>
+  </body></html>`;
+  const { internals, document } = loadVellum(t, html);
+  const p = document.querySelector("p");
+  assert.equal(internals.Selector.pathOf(p), "main > .hero > p");
+});
+
+test("pathOf strips CSS-module hash classes", (t) => {
+  const html = `<!doctype html><html><body>
+    <main><div class="card_abc12345"><p>Hi</p></div></main>
+  </body></html>`;
+  const { internals, document } = loadVellum(t, html);
+  const p = document.querySelector("p");
+  assert.equal(internals.Selector.pathOf(p), "main > .card > p");
+});
+
+test("pathOf skips short and uppercase-hash classes", (t) => {
+  const html = `<!doctype html><html><body>
+    <main><div class="xs ABCDE12345 hero"><p>Hi</p></div></main>
+  </body></html>`;
+  const { internals, document } = loadVellum(t, html);
+  const p = document.querySelector("p");
+  assert.equal(internals.Selector.pathOf(p), "main > .hero > p");
+});
+
+test("pathOf skips html and body", (t) => {
+  const html = `<!doctype html><html><body><p>Hi</p></body></html>`;
+  const { internals, document } = loadVellum(t, html);
+  const p = document.querySelector("p");
+  assert.equal(internals.Selector.pathOf(p), "p");
+});
+
+test("pathOf appends nth-of-type when sibling tag is duplicated", (t) => {
+  const html = `<!doctype html><html><body>
+    <main><p>One</p><p>Two</p><p>Three</p></main>
+  </body></html>`;
+  const { internals, document } = loadVellum(t, html);
+  const ps = document.querySelectorAll("p");
+  assert.equal(internals.Selector.pathOf(ps[0]), "main > p:nth-of-type(1)");
+  assert.equal(internals.Selector.pathOf(ps[1]), "main > p:nth-of-type(2)");
+  assert.equal(internals.Selector.pathOf(ps[2]), "main > p:nth-of-type(3)");
+});
+
+test("pathOf round-trips: querySelector(pathOf(el)) === el", (t) => {
+  const html = `<!doctype html><html><body>
+    <main id="root">
+      <section class="hero"><h1>Title</h1><p>One</p><p>Two</p></section>
+      <article><p>A</p><p>B</p></article>
+    </main>
+  </body></html>`;
+  const { internals, document } = loadVellum(t, html);
+  for (const el of document.querySelectorAll("h1, p")) {
+    const path = internals.Selector.pathOf(el);
+    assert.equal(document.querySelector(path), el, `path "${path}" should resolve back to its element`);
+  }
+});
+
+test("nameOf produces tag-aware human-readable names", (t) => {
+  const html = `<!doctype html><html><body>
+    <h1>Welcome to our site</h1>
+    <p>Lorem ipsum dolor sit amet consectetur adipiscing elit.</p>
+    <button>Sign up</button>
+    <a href="#">Read more</a>
+    <li>First entry</li>
+    <code>npm install</code>
+    <span>label</span>
+    <div class="container">unknown</div>
+  </body></html>`;
+  const { internals, document } = loadVellum(t, html);
+  assert.equal(internals.Selector.nameOf(document.querySelector("h1")), 'h1 "Welcome to our site"');
+  assert.match(internals.Selector.nameOf(document.querySelector("p")), /^paragraph: "Lorem ipsum dolor sit amet/);
+  assert.equal(internals.Selector.nameOf(document.querySelector("button")), 'button "Sign up"');
+  assert.equal(internals.Selector.nameOf(document.querySelector("a")), 'link "Read more"');
+  assert.equal(internals.Selector.nameOf(document.querySelector("li")), 'list item: "First entry"');
+  assert.equal(internals.Selector.nameOf(document.querySelector("code")), 'code: `npm install`');
+  assert.equal(internals.Selector.nameOf(document.querySelector("span")), '"label"');
+});
