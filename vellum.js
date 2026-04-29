@@ -2,7 +2,7 @@
  * https://github.com/wonderlandgardens/vellum
  */
 (() => {
-  const VERSION = "1.0.2";
+  const VERSION = "1.0.3";
 
   // Internal modules — populated by subsequent tasks.
   const Selector = (() => {
@@ -689,11 +689,13 @@
 
   async function copy(format = "markdown") {
     const list = buildEditList();
+    if (list.length === 0) return "";
     const payload = format === "json"
       ? Output.json(list, ctx())
       : Output.markdown(list, ctx());
     try {
       await navigator.clipboard.writeText(payload);
+      reset();
     } catch (e) {
       window.prompt("Copy this:", payload);
     }
