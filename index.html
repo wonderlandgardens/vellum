@@ -396,10 +396,12 @@
     const lines = [];
 
     /* ============ EDIT PERSISTENCE ============ */
-    const STORAGE_KEY = 'blueprint-edits-v1';
+    const STORAGE_KEY = 'blueprint-edits-v2';
 
     function loadEdits() {
       try {
+        // One-time cleanup of older keys that pre-date the structural change
+        localStorage.removeItem('blueprint-edits-v1');
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         const saved = JSON.parse(raw);
