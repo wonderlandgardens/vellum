@@ -16,7 +16,7 @@ You're reviewing a page with an AI agent. You want to change a heading, fix a ty
 Drag this to your bookmarks bar:
 
 ```
-javascript:(()=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/<owner>/vellum@main/vellum.js';document.head.appendChild(s);})()
+javascript:(()=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/wonderlandgardens/vellum@main/vellum.js';document.head.appendChild(s);})()
 ```
 
 Click it on any page to load vellum.
@@ -24,7 +24,7 @@ Click it on any page to load vellum.
 ### Script tag
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/<owner>/vellum@main/vellum.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/wonderlandgardens/vellum@main/vellum.js"></script>
 ```
 
 ### npm

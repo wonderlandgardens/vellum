@@ -23,7 +23,7 @@
     "overlay"
   ],
   "license": "MIT",
-  "repository": "<owner>/vellum",
+  "repository": "wonderlandgardens/vellum",
   "devDependencies": {
     "jsdom": "^24.0.0"
   }

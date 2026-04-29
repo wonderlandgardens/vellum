@@ -1,4 +1,4 @@
-const SRC = "https://cdn.jsdelivr.net/gh/<owner>/vellum@main/vellum.js";
+const SRC = "https://cdn.jsdelivr.net/gh/wonderlandgardens/vellum@main/vellum.js";
 
 export function mount(opts = {}) {
   if (typeof document === "undefined") return Promise.resolve(null);

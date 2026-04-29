@@ -1,5 +1,5 @@
 /* Vellum — drop-in editable-text overlay. MIT.
- * https://github.com/<owner>/vellum
+ * https://github.com/wonderlandgardens/vellum
  */
 (() => {
   const VERSION = "1.0.0";
