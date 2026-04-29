@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blueprint MKB AI · Diagrams</title>
+  <style>
+    :root {
+      --ink:        #111111;
+      --ink-soft:   #6E6E6E;
+      --ink-mute:   #9A9A9A;
+      --ink-faint:  #C8C8C8;
+      --paper:      #EDEDEB;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Inter', 'Helvetica Neue', system-ui, -apple-system, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 60px auto;
+      padding: 0 32px 60px;
+    }
+    .diagram { margin: 72px 0; }
+    .diagram-head {
+      margin: 0 0 20px;
+    }
+    .diagram-head .eyebrow {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #000;
+      margin-bottom: 6px;
+    }
+
+    /* ============ MODALITY ============ */
+    .modality {
+      border-top: 2px solid var(--ink-faint);
+      padding-top: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 32px;
+    }
+    .modality .col h3 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .modality .col .subtitle {
+      font-size: 15px;
+      color: var(--ink-soft);
+      margin-bottom: 24px;
+    }
+    .modality .col .body {
+      font-size: 15px;
+      color: var(--ink);
+      margin-bottom: 24px;
+    }
+    .modality .col .meta {
+      font-size: 15px;
+      color: var(--ink-soft);
+    }
+
+    /* ============ STACK MAPPING ============ */
+    .stack {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: stretch;
+    }
+    .stack-col-head {
+      font-size: 13px;
+      color: var(--ink-mute);
+      margin-bottom: 12px;
+      height: 18px;
+    }
+    .stack-pp {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .stack-enterprise {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 95px;
+    }
+    .stack-box {
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      padding: 16px 20px;
+      background: var(--paper);
+    }
+    .stack-box h4 {
+      margin: 0 0 4px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .stack-box p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+
+    /* ============ KNOWLEDGE GRAPH ============ */
+    .graph {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px 36px;
+    }
+    .g-box {
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      padding: 16px 22px;
+      background: var(--paper);
+    }
+    .g-box.full { grid-column: 1 / -1; }
+    .g-box.dark {
+      background: var(--ink);
+      color: #EDEDEB;
+    }
+    .g-box.dark h4 { color: #EDEDEB; }
+    .g-box.dark p { color: #C8C8C8; }
+    .g-box.dashed { border-style: dashed; }
+    .g-box h4 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .g-box .lede {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+    .g-box .divider {
+      border: 0;
+      border-top: 2px solid var(--ink-faint);
+      margin: 12px -22px;
+    }
+    .g-box.dark .divider { border-color: #3A3A3A; }
+    .g-box .meta {
+      margin: 0;
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+    .g-box.dark .meta { color: #C8C8C8; }
+    .g-meta-row {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .g-center {
+      grid-column: 1 / -1;
+      max-width: 62%;
+      margin: 0 auto;
+      text-align: center;
+      width: 100%;
+    }
+    .g-center .lede,
+    .g-center .meta { text-align: center; }
+
+    /* ============ EDITABLE ============ */
+    [contenteditable="true"] {
+      cursor: text;
+      transition: background-color 0.15s ease;
+      border-radius: 3px;
+    }
+    [contenteditable="true"]:hover {
+      background: rgba(17, 17, 17, 0.04);
+    }
+    [contenteditable="true"]:focus {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+      background: #fff;
+    }
+    .g-box.dark [contenteditable="true"]:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    .g-box.dark [contenteditable="true"]:focus {
+      outline-color: #EDEDEB;
+      background: #222;
+    }
+
+    @media (max-width: 800px) {
+      main { padding: 0 20px 60px; margin-top: 40px; }
+      .diagram { margin: 60px 0; }
+      .modality { grid-template-columns: 1fr; gap: 32px; }
+      .stack { grid-template-columns: 1fr; gap: 32px; }
+      .stack-enterprise { padding-top: 0; }
+      .g-center { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+
+    <!-- 01 MODALITY -->
+    <article class="diagram" id="modality">
+      <header class="diagram-head">
+        <span class="eyebrow" contenteditable="true">01 Wat we doen</span>
+      </header>
+      <div class="modality">
+        <div class="col">
+          <h3 contenteditable="true">Transform</h3>
+          <div class="subtitle" contenteditable="true">Full equity take-over</div>
+          <div class="body" contenteditable="true">We kopen je bedrijf met een PE-partner</div>
+          <div class="meta" contenteditable="true">80-100% acquisitie</div>
+        </div>
+        <div class="col">
+          <h3 contenteditable="true">Replace</h3>
+          <div class="subtitle" contenteditable="true">Maak 1 workflow agentic</div>
+          <div class="body" contenteditable="true">We maken 1 werkproces agentic&nbsp;</div>
+          <div class="meta" contenteditable="true">Revenue-share</div>
+        </div>
+        <div class="col">
+          <h3 contenteditable="true">Co-build</h3>
+          <div class="subtitle" contenteditable="true">Joint venture</div>
+          <div class="body" contenteditable="true">We bouwen samen een tool / product</div>
+          <div class="meta" contenteditable="true">JV-structuur in nieuwe entiteit</div>
+        </div>
+      </div>
+    </article>
+
+    <!-- 02 STACK -->
+    <article class="diagram" id="stack">
+      <header class="diagram-head">
+        <span class="eyebrow" contenteditable="true">02 PP MKB Stack</span>
+      </header>
+      <div class="stack">
+        <div>
+          <div class="stack-col-head" contenteditable="true">PP MKB Stack</div>
+          <div class="stack-pp">
+            <div class="stack-box" id="pp-ui">
+              <h4 contenteditable="true">6. UI laag</h4>
+              <p contenteditable="true">Next.js, Shadcn, Tailwind ,Tauri, Expo</p>
+              <p contenteditable="true"><br></p>
+            </div>
+            <div class="stack-box" id="pp-model">
+              <h4 contenteditable="true">5. Model laag</h4>
+              <p contenteditable="true">OpenRouter, Claude, Gemini</p>
+            </div>
+            <div class="stack-box" id="pp-api">
+              <h4 contenteditable="true">4. API + logica + agents</h4>
+              <p contenteditable="true">Hono + tRPC, Drizzle, TS-native agents, Trigger.dev</p>
+              <p contenteditable="true"><br></p>
+            </div>
+            <div class="stack-box" id="pp-compliance">
+              <h4 contenteditable="true">3. Compliance + observability</h4>
+              <p contenteditable="true">Supabase RLS, MCP OAuth, Langfuse EU, AI Act, AVG</p>
+              <p contenteditable="true"><br></p>
+            </div>
+            <div class="stack-box" id="pp-data">
+              <h4 contenteditable="true">2. Data laag</h4>
+              <p contenteditable="true">Supabase EU, pgvector, pg_graph, ERP sync</p>
+              <p contenteditable="true"><br></p>
+            </div>
+            <div class="stack-box" id="pp-arch">
+              <h4 contenteditable="true">1. App architectuur</h4>
+              <p contenteditable="true">Bun, TypeScript, monorepo</p>
+            </div>
+            <div class="stack-box" id="pp-hosting">
+              <h4 contenteditable="true">0. Hosting</h4>
+              <p contenteditable="true">Supabase, Railway, Vercel, Cloudflare</p>
+            </div>
+            <div class="stack-box" id="pp-ext">
+              <h4 contenteditable="true">Externe services (best of breed)</h4>
+              <p contenteditable="true">Can we anything (tools) that we can connect to&nbsp;</p>
+              <p contenteditable="true"><br></p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="stack-col-head" contenteditable="true"><br></div>
+          <div class="stack-enterprise">
+            <div class="stack-box" id="ent-intel">
+              <h4 contenteditable="true">Intelligentie</h4>
+              <p contenteditable="true">LLM,&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Segmentation&nbsp;</span>,&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Monitor / BI</span></p>
+            </div>
+            <div class="stack-box" id="ent-auto">
+              <h4 contenteditable="true">Automatiseringen</h4>
+              <p contenteditable="true"><span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Chatbots ,&nbsp;</span>Agents, RPA,&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Predictions</span></p>
+            </div>
+            <div class="stack-box" id="ent-gov">
+              <h4 contenteditable="true">Governance</h4>
+              <p contenteditable="true">RLS, RBAC,&nbsp;&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Orchestration,&nbsp;</span><span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Role based acces</span></p>
+            </div>
+            <div class="stack-box" id="ent-data">
+              <h4 contenteditable="true">Data</h4>
+              <p contenteditable="true">Gestructureerd + ongestructureerd</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- 03 KNOWLEDGE GRAPH -->
+    <article class="diagram" id="graph">
+      <header class="diagram-head">
+        <span class="eyebrow" contenteditable="true">03 PP Engagement journey</span>
+      </header>
+      <div class="graph">
+        <div class="g-box full" id="kg-compass">
+          <h4 contenteditable="true">Pre-Intake</h4>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">strategische hefboom + modaliteit-keuze, 60–90 min met PP-partner</p>
+        </div>
+        <div class="g-box" id="kg-intake">
+          <h4 contenteditable="true">Intake</h4>
+          <p class="lede" contenteditable="true">proceskaart, as-is of to-be</p>
+          <hr class="divider">
+          <p class="meta" contenteditable="true"><br></p>
+          <p class="meta" contenteditable="true"><br></p>
+        </div>
+        <div class="g-box dashed" id="kg-offramp">
+          <h4 contenteditable="true">Off-ramp: referral</h4>
+          <p class="lede" contenteditable="true">externe partner neemt klant over</p>
+          <hr class="divider">
+          <p class="meta" contenteditable="true">PP krijgt X% referral-fee</p>
+          <p class="meta" contenteditable="true">geen verdere PP-betrokkenheid</p>
+        </div>
+        <div class="g-box full" id="kg-refinery">
+          <h4 contenteditable="true">Refinery</h4>
+          <p class="lede" contenteditable="true">agent-spec, partner-briefing-pakket</p>
+          <hr class="divider">
+          <p class="meta" contenteditable="true"><br></p>
+          <p class="meta" contenteditable="true"><br></p>
+        </div>
+        <div class="g-box full" id="kg-validator-pre">
+          <h4 contenteditable="true">Validator (vooraf)</h4>
+          <p class="lede" contenteditable="true">eval-set + business case, 2 weken handmatig</p>
+          <hr class="divider">
+          <p class="meta" contenteditable="true"><br></p>
+          <p class="meta" contenteditable="true"><br></p>
+        </div>
+        <div class="g-box full dark" id="kg-foundry">
+          <h4 contenteditable="true">Foundry</h4>
+          <p class="lede" contenteditable="true">PP bouwt op de PP MKB Stack met skin-in-the-game (equity, rev-share of JV)</p>
+          <hr class="divider">
+          <div class="g-meta-row">
+            <p class="meta" contenteditable="true"><br></p>
+            <p class="meta" contenteditable="true"><br></p>
+            <p class="meta" contenteditable="true"><br></p>
+          </div>
+        </div>
+        <div class="g-box g-center" id="kg-prod">
+          <h4 contenteditable="true">Tool / Product Live</h4>
+          <p class="lede" style="margin-bottom:0" contenteditable="true"><br></p>
+        </div>
+        <div class="g-box" id="kg-meting">
+          <h4 contenteditable="true"><span style="color: rgb(110, 110, 110); font-size: 14px; font-weight: 400;">operationele metrics</span></h4>
+          <p class="lede" contenteditable="true">response-tijd, foutpercentage, kosten</p>
+          <p class="meta" contenteditable="true"><br></p>
+        </div>
+        <div class="g-box" id="kg-loop">
+          <h4 contenteditable="true"><span style="color: rgb(110, 110, 110); font-size: 14px; font-weight: 400;">business metrics</span></h4>
+          <p class="lede" contenteditable="true">impact in euro's, hit-rate, doorlooptijd</p>
+          <p class="meta" contenteditable="true"><br></p>
+        </div>
+        <div class="g-box g-center" id="kg-kpi">
+          <h4 contenteditable="true">KPI-dashboard</h4>
+          <p class="lede" style="margin-bottom:0" contenteditable="true">Meetbare business impact</p>
+        </div>
+        <div class="g-box g-center" id="kg-impact">
+          <h4 contenteditable="true">Business impact = succes voor PP</h4>
+          <p class="lede" contenteditable="true">Meer gemeten impact bij klant betekent meer waarde voor PP</p>
+          <p class="meta" contenteditable="true">PP-integratie slaagt alleen als klant aantoonbaar wint</p>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <div style="position:fixed;bottom:16px;right:16px;z-index:100;display:flex;gap:8px;">
+    <button id="copy-edits"
+            style="background:#111;border:1px solid #111;border-radius:6px;padding:6px 12px;font:inherit;font-size:12px;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+      Copy as JSON
+    </button>
+    <button id="reset-edits"
+            style="background:#fff;border:1px solid #C8C8C8;border-radius:6px;padding:6px 12px;font:inherit;font-size:12px;color:#6E6E6E;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+      Reset edits
+    </button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/leader-line-new@1.1.9/leader-line.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <script>
+    const ink = '#111111';
+    const mute = '#9A9A9A';
+    const lines = [];
+
+    /* ============ EDIT PERSISTENCE ============ */
+    const STORAGE_KEY = 'blueprint-edits-v1';
+
+    function loadEdits() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        document.querySelectorAll('[contenteditable="true"]').forEach((el, i) => {
+          if (saved[i] !== undefined) el.innerHTML = saved[i];
+        });
+      } catch (e) { console.warn('Could not load edits', e); }
+    }
+
+    let saveTimer;
+    function saveEdits() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        const data = {};
+        document.querySelectorAll('[contenteditable="true"]').forEach((el, i) => {
+          data[i] = el.innerHTML;
+        });
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+        catch (e) { console.warn('Could not save edits', e); }
+      }, 200);
+    }
+
+    function connect(aId, bId, opts = {}) {
+      const a = document.getElementById(aId);
+      const b = document.getElementById(bId);
+      if (!a || !b) return null;
+      const line = new LeaderLine(a, b, Object.assign({
+        color: ink,
+        size: 2,
+        path: 'fluid',
+        startSocket: 'bottom',
+        endSocket: 'top',
+        startPlug: 'behind',
+        endPlug: 'arrow1',
+        endPlugSize: 2,
+        hide: true,
+      }, opts));
+      lines.push(line);
+      return line;
+    }
+
+    function buildLines() {
+      // Stack mapping — straight horizontal connectors, no arrowheads
+      const stackOpts = {
+        path: 'straight',
+        startSocket: 'right',
+        endSocket: 'left',
+        endPlug: 'behind',
+      };
+      connect('pp-model', 'ent-intel', stackOpts);
+      connect('pp-api', 'ent-auto', stackOpts);
+      connect('pp-compliance', 'ent-gov', stackOpts);
+      connect('pp-data', 'ent-data', stackOpts);
+
+      // Knowledge graph — Compass branches
+      connect('kg-compass', 'kg-intake', {
+        startSocketGravity: [0, 80],
+        endSocketGravity: [0, -80],
+        middleLabel: LeaderLine.captionLabel('past bij PP', { color: mute, fontSize: 13, offset: [16, 0] }),
+      });
+      connect('kg-compass', 'kg-offramp', {
+        startSocketGravity: [0, 80],
+        endSocketGravity: [0, -80],
+        middleLabel: LeaderLine.captionLabel('past niet bij PP', { color: mute, fontSize: 13, offset: [16, 0] }),
+      });
+
+      // Vertical flow
+      connect('kg-intake', 'kg-refinery');
+      connect('kg-refinery', 'kg-validator-pre');
+      connect('kg-validator-pre', 'kg-foundry');
+      connect('kg-foundry', 'kg-prod');
+
+      // Split from prod → meting + loop (S-curves)
+      connect('kg-prod', 'kg-meting', { startSocketGravity: [0, 80] });
+      connect('kg-prod', 'kg-loop', { startSocketGravity: [0, 80] });
+
+      // Merge → KPI
+      connect('kg-meting', 'kg-kpi', { endSocketGravity: [0, -80] });
+      connect('kg-loop', 'kg-kpi', { endSocketGravity: [0, -80] });
+
+      // Dashed → impact
+      connect('kg-kpi', 'kg-impact', {
+        path: 'straight',
+        dash: { len: 6, gap: 4, animation: false },
+      });
+    }
+
+    function repositionAll() {
+      lines.forEach(l => { try { l.position(); } catch(e) {} });
+    }
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(repositionAll, 60);
+    });
+
+    document.addEventListener('input', (e) => {
+      if (e.target.isContentEditable) {
+        saveEdits();
+        repositionAll();
+      }
+    });
+
+    document.getElementById('reset-edits').addEventListener('click', () => {
+      if (confirm('Reset all edits to the original text?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    });
+
+    document.getElementById('copy-edits').addEventListener('click', async (e) => {
+      const btn = e.currentTarget;
+      const editables = document.querySelectorAll('[contenteditable="true"]');
+      const data = {};
+      editables.forEach((el, i) => {
+        const path = [];
+        let n = el;
+        while (n && n !== document.body) {
+          const id = n.id ? `#${n.id}` : '';
+          const cls = n.className && typeof n.className === 'string'
+            ? '.' + n.className.trim().split(/\s+/).join('.') : '';
+          path.unshift(`${n.tagName.toLowerCase()}${id}${cls}`);
+          n = n.parentElement;
+        }
+        data[i] = { path: path.join(' > '), html: el.innerHTML };
+      });
+      const json = JSON.stringify(data, null, 2);
+      try {
+        await navigator.clipboard.writeText(json);
+        const orig = btn.textContent;
+        btn.textContent = 'Copied ✓';
+        setTimeout(() => btn.textContent = orig, 1500);
+      } catch (err) {
+        prompt('Copy this JSON:', json);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadEdits();
+      buildLines();
+
+      anime({
+        targets: '.modality .col, .stack-box, .g-box',
+        translateY: [10, 0],
+        opacity: [0, 1],
+        delay: anime.stagger(35),
+        duration: 450,
+        easing: 'easeOutQuad',
+        complete: () => {
+          repositionAll();
+          lines.forEach((l, i) => {
+            setTimeout(() => l.show('draw', { duration: 500 }), i * 30);
+          });
+        },
+      });
+
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(repositionAll);
+      }
+    });
+  </script>
+</body>
+</html>
