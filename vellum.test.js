@@ -32,7 +32,7 @@ function loadVellum(t, html = "<!doctype html><html><body></body></html>") {
 test("vellum loads without throwing and exposes test internals", (t) => {
   const { window, internals } = loadVellum(t);
   assert.ok(window.Vellum);
-  assert.equal(window.Vellum.version, "1.0.0");
+  assert.match(window.Vellum.version, /^\d+\.\d+\.\d+$/);
   assert.ok(internals);
   assert.ok(internals.Selector);
   assert.ok(internals.Snapshot);

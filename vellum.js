@@ -2,7 +2,7 @@
  * https://github.com/wonderlandgardens/vellum
  */
 (() => {
-  const VERSION = "1.0.0";
+  const VERSION = "1.0.1";
 
   // Internal modules — populated by subsequent tasks.
   const Selector = (() => {
@@ -307,10 +307,39 @@
     mode = newMode;
     if (mode === "always-on") {
       removeClickToArmListeners();
-      armAll();
+      scheduleHydrationSafeArm();
     } else {
       disarmAll();
       installClickToArmListeners();
+    }
+  }
+
+  function isLikelyHydrating() {
+    if (document.getElementById("__NEXT_DATA__")) return true;
+    if (document.querySelector('script[data-rsc]')) return true;
+    if (document.querySelector('script[id^="$R"]')) return true;
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
+    while (walker.nextNode()) {
+      const data = walker.currentNode.nodeValue;
+      if (data === "$" || data === "/$" || data === "$?" || data === "$!") return true;
+    }
+    return false;
+  }
+
+  function scheduleHydrationSafeArm() {
+    const run = () => {
+      if (isLikelyHydrating()) {
+        requestAnimationFrame(() => requestAnimationFrame(armAll));
+      } else if (typeof requestIdleCallback === "function") {
+        requestIdleCallback(armAll, { timeout: 500 });
+      } else {
+        setTimeout(armAll, 100);
+      }
+    };
+    if (document.readyState === "complete") {
+      run();
+    } else {
+      window.addEventListener("load", run, { once: true });
     }
   }
 
@@ -347,7 +376,7 @@
     if (mode === "click-to-arm") {
       installClickToArmListeners();
     } else {
-      armAll();
+      scheduleHydrationSafeArm();
     }
   }
 

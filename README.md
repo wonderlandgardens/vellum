@@ -83,6 +83,12 @@ Modes:
 
 Opt elements out with `data-vellum-ignore` (applies to descendants too).
 
+## Frameworks
+
+Vellum auto-detects React/Next.js hydration and defers attribute-arming until after the page hydrates, so always-on mode is safe to drop into a Next.js App Router root layout without triggering hydration mismatch warnings.
+
+For SSR-heavy pages with lots of client-side rendering, **click-to-arm mode** is the conservative default — nothing is mutated on the page until you actively click an element.
+
 ## What it doesn't do
 
 Vellum is text-only. It doesn't capture screenshots, computed styles, accessibility info, React component locations, or visual annotations.
