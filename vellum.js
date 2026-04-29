@@ -469,23 +469,140 @@
   return { mount, flash, unmount, getHost, showStorageBadge };
 })();
 
-  // Public API — populated as modules come online.
-  const Vellum = {
-    version: VERSION,
-    mount() {},
-    unmount() {},
-    copy() {},
-    reset() {},
-    setMode() {},
-  };
+  function viewport() {
+    return `${window.innerWidth}×${window.innerHeight}`;
+  }
+
+  function ctx() {
+    return {
+      url: window.location.href,
+      pathname: window.location.pathname,
+      viewport: viewport(),
+    };
+  }
+
+  function buildEditList() {
+    const list = [];
+    for (const { path, before } of Snapshot.all()) {
+      let live = null;
+      try { live = document.querySelector(path); } catch (e) {}
+      if (live) {
+        const after = live.innerHTML;
+        if (before === after) continue;
+        list.push({ path, name: Selector.nameOf(live), before, after, removed: false });
+      } else {
+        list.push({ path, name: "(removed)", before, after: null, removed: true });
+      }
+    }
+    return list;
+  }
+
+  function persist() {
+    const edits = {};
+    for (const { path } of Snapshot.all()) {
+      const live = (() => { try { return document.querySelector(path); } catch (e) { return null; } })();
+      if (live) edits[path] = live.innerHTML;
+    }
+    Storage.save({
+      edits,
+      snapshots: Snapshot.serialize(),
+      mode: currentMode,
+    }, { debounce: true });
+  }
+
+  function applySavedEdits(edits) {
+    for (const [path, html] of Object.entries(edits || {})) {
+      let live = null;
+      try { live = document.querySelector(path); } catch (e) {}
+      if (live) live.innerHTML = html;
+    }
+  }
+
+  let currentMode = (typeof window !== "undefined" && window.VELLUM_MODE) || "always-on";
+
+  async function copy(format = "markdown") {
+    const list = buildEditList();
+    const payload = format === "json"
+      ? Output.json(list, ctx())
+      : Output.markdown(list, ctx());
+    try {
+      await navigator.clipboard.writeText(payload);
+    } catch (e) {
+      window.prompt("Copy this:", payload);
+    }
+    return payload;
+  }
+
+  function reset() {
+    if (!window.confirm("Reset all edits to original?")) return;
+    for (const { path, before } of Snapshot.all()) {
+      let live = null;
+      try { live = document.querySelector(path); } catch (e) {}
+      if (live) live.innerHTML = before;
+    }
+    Snapshot.clear();
+    Storage.clear();
+    Toolbar.flash(0);
+  }
+
+  function setMode(newMode) {
+    currentMode = newMode;
+    Scanner.setMode(newMode);
+    persist();
+  }
+
+  function mount() {
+    if (window.__vellumMounted) return;
+    window.__vellumMounted = true;
+
+    const saved = Storage.load() || {};
+    if (saved.snapshots) Snapshot.hydrate(saved.snapshots);
+    if (saved.mode) currentMode = saved.mode;
+
+    const host = Toolbar.mount({
+      initialMode: currentMode,
+      onCopyMarkdown: () => copy("markdown"),
+      onCopyJson: () => copy("json"),
+      onReset: reset,
+      onModeChange: setMode,
+    });
+
+    Scanner.init({
+      toolbarHost: host,
+      initialMode: currentMode,
+      onEdit: (el) => {
+        const path = Selector.pathOf(el);
+        const original = Scanner.getOriginalHTML(el);
+        Snapshot.capture(path, original);
+        persist();
+        Toolbar.flash(Snapshot.all().length);
+      },
+    });
+
+    if (saved.edits) applySavedEdits(saved.edits);
+    Toolbar.flash(Snapshot.all().length);
+
+    if (Storage.unavailable) Toolbar.showStorageBadge();
+  }
+
+  function unmount() {
+    Scanner.destroy();
+    Toolbar.unmount();
+    window.__vellumMounted = false;
+  }
+
+  const Vellum = { version: VERSION, mount, unmount, copy, reset, setMode };
 
   if (typeof window !== "undefined") {
     window.Vellum = Vellum;
 
-    // Only the four pure modules are exposed for unit testing; Scanner and
-    // Toolbar have DOM side effects and are smoke-tested via index.html.
-    if (globalThis.__VELLUM_TEST__ || (typeof window !== "undefined" && window.__VELLUM_TEST__)) {
+    if (globalThis.__VELLUM_TEST__ || window.__VELLUM_TEST__) {
       globalThis.__vellumInternals = { Selector, Snapshot, Storage, Output };
+      window.__vellumInternals = { Selector, Snapshot, Storage, Output };
+    } else if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", mount, { once: true });
+    } else {
+      mount();
     }
   }
 })();
