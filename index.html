@@ -76,25 +76,16 @@
     .stack {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 80px;
+      column-gap: 80px;
+      row-gap: 12px;
       align-items: stretch;
     }
     .stack-col-head {
       font-size: 13px;
       color: var(--ink-mute);
-      margin-bottom: 12px;
-      height: 18px;
     }
-    .stack-pp {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .stack-enterprise {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding-top: 95px;
+    .stack-spacer {
+      /* invisible cell — takes the height of its grid row */
     }
     .stack-box {
       border: 2px solid var(--ink);
@@ -198,8 +189,8 @@
       main { padding: 0 20px 60px; margin-top: 40px; }
       .diagram { margin: 60px 0; }
       .modality { grid-template-columns: 1fr; gap: 32px; }
-      .stack { grid-template-columns: 1fr; gap: 32px; }
-      .stack-enterprise { padding-top: 0; }
+      .stack { grid-template-columns: 1fr; column-gap: 0; row-gap: 12px; }
+      .stack-spacer { display: none; }
       .g-center { max-width: 100%; }
     }
   </style>
@@ -240,69 +231,73 @@
         <span class="eyebrow" contenteditable="true">02 PP MKB Stack</span>
       </header>
       <div class="stack">
-        <div>
-          <div class="stack-col-head" contenteditable="true">PP MKB Stack</div>
-          <div class="stack-pp">
-            <div class="stack-box" id="pp-ui">
-              <h4 contenteditable="true">6. UI laag</h4>
-              <p contenteditable="true">Next.js, Shadcn, Tailwind ,Tauri, Expo</p>
-              <p contenteditable="true"><br></p>
-            </div>
-            <div class="stack-box" id="pp-model">
-              <h4 contenteditable="true">5. Model laag</h4>
-              <p contenteditable="true">OpenRouter, Claude, Gemini</p>
-            </div>
-            <div class="stack-box" id="pp-api">
-              <h4 contenteditable="true">4. API + logica + agents</h4>
-              <p contenteditable="true">Hono + tRPC, Drizzle, TS-native agents, Trigger.dev</p>
-              <p contenteditable="true"><br></p>
-            </div>
-            <div class="stack-box" id="pp-compliance">
-              <h4 contenteditable="true">3. Compliance + observability</h4>
-              <p contenteditable="true">Supabase RLS, MCP OAuth, Langfuse EU, AI Act, AVG</p>
-              <p contenteditable="true"><br></p>
-            </div>
-            <div class="stack-box" id="pp-data">
-              <h4 contenteditable="true">2. Data laag</h4>
-              <p contenteditable="true">Supabase EU, pgvector, pg_graph, ERP sync</p>
-              <p contenteditable="true"><br></p>
-            </div>
-            <div class="stack-box" id="pp-arch">
-              <h4 contenteditable="true">1. App architectuur</h4>
-              <p contenteditable="true">Bun, TypeScript, monorepo</p>
-            </div>
-            <div class="stack-box" id="pp-hosting">
-              <h4 contenteditable="true">0. Hosting</h4>
-              <p contenteditable="true">Supabase, Railway, Vercel, Cloudflare</p>
-            </div>
-            <div class="stack-box" id="pp-ext">
-              <h4 contenteditable="true">Externe services (best of breed)</h4>
-              <p contenteditable="true">Can we anything (tools) that we can connect to&nbsp;</p>
-              <p contenteditable="true"><br></p>
-            </div>
-          </div>
+        <div class="stack-col-head" contenteditable="true">PP MKB Stack</div>
+        <div class="stack-col-head" contenteditable="true"><br></div>
+
+        <div class="stack-box" id="pp-ui">
+          <h4 contenteditable="true">6. UI laag</h4>
+          <p contenteditable="true">Next.js, Shadcn, Tailwind ,Tauri, Expo</p>
+          <p contenteditable="true"><br></p>
         </div>
-        <div>
-          <div class="stack-col-head" contenteditable="true"><br></div>
-          <div class="stack-enterprise">
-            <div class="stack-box" id="ent-intel">
-              <h4 contenteditable="true">Intelligentie</h4>
-              <p contenteditable="true">LLM,&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Segmentation&nbsp;</span>,&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Monitor / BI</span></p>
-            </div>
-            <div class="stack-box" id="ent-auto">
-              <h4 contenteditable="true">Automatiseringen</h4>
-              <p contenteditable="true"><span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Chatbots ,&nbsp;</span>Agents, RPA,&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Predictions</span></p>
-            </div>
-            <div class="stack-box" id="ent-gov">
-              <h4 contenteditable="true">Governance</h4>
-              <p contenteditable="true">RLS, RBAC,&nbsp;&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Orchestration,&nbsp;</span><span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Role based acces</span></p>
-            </div>
-            <div class="stack-box" id="ent-data">
-              <h4 contenteditable="true">Data</h4>
-              <p contenteditable="true">Gestructureerd + ongestructureerd</p>
-            </div>
-          </div>
+        <div class="stack-spacer"></div>
+
+        <div class="stack-box" id="pp-model">
+          <h4 contenteditable="true">5. Model laag</h4>
+          <p contenteditable="true">OpenRouter, Claude, Gemini</p>
         </div>
+        <div class="stack-box" id="ent-intel">
+          <h4 contenteditable="true">Intelligentie</h4>
+          <p contenteditable="true">LLM,&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Segmentation&nbsp;</span>,&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Monitor / BI</span></p>
+        </div>
+
+        <div class="stack-box" id="pp-api">
+          <h4 contenteditable="true">4. API + logica + agents</h4>
+          <p contenteditable="true">Hono + tRPC, Drizzle, TS-native agents, Trigger.dev</p>
+          <p contenteditable="true"><br></p>
+        </div>
+        <div class="stack-box" id="ent-auto">
+          <h4 contenteditable="true">Automatiseringen</h4>
+          <p contenteditable="true"><span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Chatbots ,&nbsp;</span>Agents, RPA,&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Predictions</span></p>
+        </div>
+
+        <div class="stack-box" id="pp-compliance">
+          <h4 contenteditable="true">3. Compliance + observability</h4>
+          <p contenteditable="true">Supabase RLS, MCP OAuth, Langfuse EU, AI Act, AVG</p>
+          <p contenteditable="true"><br></p>
+        </div>
+        <div class="stack-box" id="ent-gov">
+          <h4 contenteditable="true">Governance</h4>
+          <p contenteditable="true">RLS, RBAC,&nbsp;&nbsp;<span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Orchestration,&nbsp;</span><span style="color: rgb(0, 0, 0); font-family: Helvetica; font-size: 12px;">Role based acces</span></p>
+        </div>
+
+        <div class="stack-box" id="pp-data">
+          <h4 contenteditable="true">2. Data laag</h4>
+          <p contenteditable="true">Supabase EU, pgvector, pg_graph, ERP sync</p>
+          <p contenteditable="true"><br></p>
+        </div>
+        <div class="stack-box" id="ent-data">
+          <h4 contenteditable="true">Data</h4>
+          <p contenteditable="true">Gestructureerd + ongestructureerd</p>
+        </div>
+
+        <div class="stack-box" id="pp-arch">
+          <h4 contenteditable="true">1. App architectuur</h4>
+          <p contenteditable="true">Bun, TypeScript, monorepo</p>
+        </div>
+        <div class="stack-spacer"></div>
+
+        <div class="stack-box" id="pp-hosting">
+          <h4 contenteditable="true">0. Hosting</h4>
+          <p contenteditable="true">Supabase, Railway, Vercel, Cloudflare</p>
+        </div>
+        <div class="stack-spacer"></div>
+
+        <div class="stack-box" id="pp-ext">
+          <h4 contenteditable="true">Externe services (best of breed)</h4>
+          <p contenteditable="true">Can we anything (tools) that we can connect to&nbsp;</p>
+          <p contenteditable="true"><br></p>
+        </div>
+        <div class="stack-spacer"></div>
       </div>
     </article>
 
