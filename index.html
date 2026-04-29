@@ -84,6 +84,10 @@
       font-size: 13px;
       color: var(--ink-mute);
     }
+    .stack-col-head--right {
+      align-self: end;
+      padding-bottom: 4px;
+    }
     .stack-spacer {
       /* invisible cell — takes the height of its grid row */
     }
@@ -233,13 +237,13 @@
       </header>
       <div class="stack">
         <div class="stack-col-head" contenteditable="true">PP MKB Stack</div>
-        <div class="stack-col-head" contenteditable="true">Enterprise stack</div>
+        <div class="stack-spacer"></div>
 
         <div class="stack-box" id="pp-ui">
           <h4 contenteditable="true">6. UI laag</h4>
           <p contenteditable="true">Next.js, Shadcn, Tailwind ,Tauri, Expo</p>
         </div>
-        <div class="stack-spacer"></div>
+        <div class="stack-col-head stack-col-head--right" contenteditable="true">Enterprise stack</div>
 
         <div class="stack-box" id="pp-model">
           <h4 contenteditable="true">5. Model laag</h4>
@@ -392,12 +396,12 @@
     const lines = [];
 
     /* ============ EDIT PERSISTENCE ============ */
-    const STORAGE_KEY = 'blueprint-edits-v3';
+    const STORAGE_KEY = 'blueprint-edits-v4';
 
     function loadEdits() {
       try {
         // One-time cleanup of older keys that pre-date the structural change
-        ['blueprint-edits-v1', 'blueprint-edits-v2'].forEach(k => localStorage.removeItem(k));
+        ['blueprint-edits-v1', 'blueprint-edits-v2', 'blueprint-edits-v3'].forEach(k => localStorage.removeItem(k));
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         const saved = JSON.parse(raw);
