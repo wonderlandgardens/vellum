@@ -85,7 +85,7 @@ Opt elements out with `data-vellum-ignore` (applies to descendants too).
 
 ## What it doesn't do
 
-Vellum is text-only. It doesn't capture screenshots, computed styles, accessibility info, React component locations, or visual annotations. For those, use [agentation](https://github.com/benjitaylor/agentation).
+Vellum is text-only. It doesn't capture screenshots, computed styles, accessibility info, React component locations, or visual annotations.
 
 ## License
 
