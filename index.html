@@ -430,13 +430,13 @@
       if (!a || !b) return null;
       const line = new LeaderLine(a, b, Object.assign({
         color: ink,
-        size: 2,
-        path: 'straight',
+        size: 1,
+        path: 'grid',
         startSocket: 'bottom',
         endSocket: 'top',
         startPlug: 'behind',
-        endPlug: 'arrow1',
-        endPlugSize: 1.2,
+        endPlug: 'disc',
+        endPlugSize: 2.5,
         hide: true,
       }, opts));
       lines.push(line);
@@ -444,18 +444,17 @@
     }
 
     function buildLines() {
-      // Stack mapping — straight horizontal connectors, no arrowheads
+      // Stack mapping — orthogonal connectors, dot at target
       const stackOpts = {
         startSocket: 'right',
         endSocket: 'left',
-        endPlug: 'behind',
       };
       connect('pp-model', 'ent-intel', stackOpts);
       connect('pp-api', 'ent-auto', stackOpts);
       connect('pp-compliance', 'ent-gov', stackOpts);
       connect('pp-data', 'ent-data', stackOpts);
 
-      // Knowledge graph — straight node-style connectors
+      // Knowledge graph — sitemap-style threading
       connect('kg-compass', 'kg-intake', {
         middleLabel: LeaderLine.captionLabel('past bij PP', { color: mute, fontSize: 13, offset: [16, 0] }),
       });
