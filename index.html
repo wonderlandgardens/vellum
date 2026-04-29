@@ -3,54 +3,306 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vellum — drop-in editable text overlay</title>
+  <title>Vellum — Edit any page. Hand the changes to your agent.</title>
   <style>
-    :root { --ink: #111; --paper: #ededeb; --soft: #6e6e6e; }
+    :root {
+      --ink: #111;
+      --soft: #6e6e6e;
+      --border: #e6e6e4;
+      --accent: #b45309;
+      --bg: #fff;
+    }
     * { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; }
     body {
-      background: var(--paper); color: var(--ink);
+      background: var(--bg);
+      color: var(--ink);
       font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
       -webkit-font-smoothing: antialiased;
     }
-    main { max-width: 720px; margin: 60px auto; padding: 0 24px 80px; }
-    h1 { font-size: 32px; margin: 0 0 8px; }
-    .lede { color: var(--soft); margin: 0 0 32px; font-size: 18px; }
-    h2 { font-size: 18px; margin: 32px 0 8px; }
-    p { margin: 0 0 12px; }
-    pre {
-      background: #fff; border: 1px solid #d6d6d4; border-radius: 6px;
-      padding: 12px 14px; overflow-x: auto; font-size: 13px;
+    main { max-width: 720px; margin: 0 auto; padding: 0 24px 80px; }
+
+    /* ── Section rhythm ── */
+    section {
+      border-top: 1px solid var(--border);
+      padding-top: 64px;
+      margin-top: 64px;
     }
-    code { background: #fff; padding: 1px 4px; border-radius: 3px; }
+
+    /* ── Hero ── */
+    .hero {
+      padding-top: 80px;
+      border-top: none;
+      margin-top: 0;
+    }
+    .hero-eyebrow {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 16px;
+    }
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin: 0 0 20px;
+    }
+    .hero-sub {
+      font-size: 18px;
+      color: var(--soft);
+      margin: 0 0 36px;
+      max-width: 580px;
+    }
+    .hero-install {
+      display: inline-block;
+      background: var(--ink);
+      color: #fff;
+      font-family: ui-monospace, "SF Mono", "Fira Code", monospace;
+      font-size: 17px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Section headings ── */
+    h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 24px;
+    }
+
+    /* ── Lists ── */
+    ol, ul {
+      padding-left: 1.4em;
+      margin: 0 0 16px;
+    }
+    ol li, ul li {
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+    ol li::marker, ul li::marker {
+      color: var(--soft);
+    }
+
+    /* ── Paragraphs ── */
+    p { margin: 0 0 16px; }
+
+    /* ── Blockquote ── */
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 16px;
+      color: var(--soft);
+      font-style: italic;
+      margin: 0 0 16px;
+    }
+
+    /* ── Code / pre ── */
+    code {
+      font-family: ui-monospace, "SF Mono", "Fira Code", monospace;
+      background: #f5f5f4;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #f5f5f4;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      overflow-x: auto;
+      font-family: ui-monospace, "SF Mono", "Fira Code", monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0 0 16px;
+      color: var(--ink);
+    }
+
+    /* ── Snippet labels ── */
+    .snippet-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--soft);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 0 0 6px;
+    }
+    .snippet-group { margin-bottom: 28px; }
+
+    /* ── Try it section ── */
     .try {
-      border-top: 2px solid #c8c8c8; padding-top: 24px; margin-top: 40px;
+      background: #fafaf9;
+    }
+    .try-intro { color: var(--soft); margin-bottom: 28px; }
+    .try-content { display: flex; flex-direction: column; gap: 20px; }
+    .try-content h3 { margin: 0; font-size: 20px; font-weight: 600; }
+    .try-content p { margin: 0; }
+    .try-content ul { margin: 0; }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .btn-primary, .btn-secondary, .btn-tertiary {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .btn-primary {
+      background: var(--ink);
+      color: #fff;
+      border: 1px solid var(--ink);
+    }
+    .btn-secondary {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--ink);
+    }
+    .btn-tertiary {
+      background: none;
+      color: var(--ink);
+      border: none;
+      text-decoration: none;
+      padding-left: 2px;
+      padding-right: 2px;
+    }
+    .btn-tertiary:hover { text-decoration: underline; }
+
+    /* ── Card ── */
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .card h4 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
+    .card p { margin: 0; color: var(--soft); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      margin-top: 80px;
+      padding: 24px 24px 40px;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      color: var(--soft);
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <main>
-    <h1>Vellum</h1>
-    <p class="lede">A drop-in overlay that makes any page's text editable. Click. Edit. Copy as agent-ready markdown.</p>
 
-    <h2>Bookmarklet</h2>
-    <p>Drag this to your bookmarks bar, then click it on any page:</p>
-    <pre><code>javascript:(()=&gt;{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/wonderlandgardens/vellum@main/vellum.js';document.head.appendChild(s);})()</code></pre>
+    <!-- ── 1. Hero ── -->
+    <section class="hero">
+      <p class="hero-eyebrow">Vellum</p>
+      <h1>Edit any page. Hand the changes to your agent.</h1>
+      <p class="hero-sub">Vellum is a drop-in overlay that turns every text node on a page into agent-ready markdown. Click. Edit. Copy. Paste.</p>
+      <div class="hero-install">npm i vellum</div>
+    </section>
 
-    <h2>Script tag</h2>
-    <pre><code>&lt;script src="https://cdn.jsdelivr.net/gh/wonderlandgardens/vellum@main/vellum.js"&gt;&lt;/script&gt;</code></pre>
+    <!-- ── 2. How you use it ── -->
+    <section>
+      <h2>How you use it</h2>
+      <ol>
+        <li>Drop vellum into your page — a <code>&lt;script&gt;</code> tag, a bookmarklet, or <code>npm i vellum</code>.</li>
+        <li>The toolbar appears bottom-right.</li>
+        <li>Click any text. It becomes editable inline.</li>
+        <li>Type your edit. The count increments.</li>
+        <li>Click <strong>Copy markdown</strong> in the toolbar.</li>
+        <li>Paste into your AI coding agent: <em>"apply these edits to the codebase."</em></li>
+      </ol>
+    </section>
 
-    <h2>npm</h2>
-    <pre><code>npm i vellum</code></pre>
-    <pre><code>import { mount } from "vellum";
-mount();</code></pre>
+    <!-- ── 3. How agents use it ── -->
+    <section>
+      <h2>How agents use it</h2>
+      <p>Vellum's output gives agents enough context to find and replace exactly what you changed.</p>
+      <ul>
+        <li>A <strong>CSS selector path</strong> (e.g. <code>main &gt; section &gt; h1</code>) for grepping markup.</li>
+        <li>The <strong>exact before and after text</strong>, preserved verbatim, for grepping copy.</li>
+        <li>An <strong>element name</strong> (<code>h1 "Pricing"</code>, <code>paragraph: "Lorem…"</code>) so the agent can disambiguate visually similar nodes.</li>
+        <li>The <strong>URL, pathname, and viewport</strong> the edit was made on.</li>
+        <li>A <strong>removed-element status</strong> when the DOM no longer contains the original target.</li>
+      </ul>
+    </section>
 
+    <!-- ── 4. Try it ── -->
     <section class="try">
       <h2>Try it</h2>
-      <p>This paragraph is editable. Click any text on this page, edit it, then click <strong>Copy markdown</strong> in the bottom-right toolbar.</p>
-      <p>Headings, paragraphs, list items, and buttons are all armed by default. Edits are saved to <code>localStorage</code>; <strong>Reset</strong> restores originals in place.</p>
+      <p class="try-intro">Edit any of the elements below. Watch the count change. Click the trashcan to discard.</p>
+      <div class="try-content">
+        <h3>Sample heading</h3>
+        <p>This is the first sample paragraph. Click to edit this text and see vellum arm the element for inline editing.</p>
+        <p>Here is a second paragraph with different content. Each element tracks its own before and after state independently.</p>
+        <ul>
+          <li>First list item — try editing this one</li>
+          <li>Second list item with a bit more text to work with</li>
+          <li>Third list item — the count updates on blur</li>
+        </ul>
+        <blockquote>The best copy is copy that sounds like a human wrote it — not a committee.</blockquote>
+        <div class="btn-row">
+          <button class="btn-primary">Primary</button>
+          <button class="btn-secondary">Secondary</button>
+          <button class="btn-tertiary">Tertiary</button>
+        </div>
+        <div class="card">
+          <h4>Sample card heading</h4>
+          <p>A short description inside a card component. Agents can pinpoint this paragraph by its selector path even when other paragraphs look identical.</p>
+        </div>
+      </div>
     </section>
+
+    <!-- ── 5. Install ── -->
+    <section>
+      <h2>Install</h2>
+
+      <div class="snippet-group">
+        <p class="snippet-label">Bookmarklet</p>
+        <pre data-vellum-ignore>javascript:(()=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/wonderlandgardens/vellum@main/vellum.js';document.head.appendChild(s);})()</pre>
+      </div>
+
+      <div class="snippet-group">
+        <p class="snippet-label">Script tag</p>
+        <pre data-vellum-ignore>&lt;script src="https://cdn.jsdelivr.net/gh/wonderlandgardens/vellum@main/vellum.js"&gt;&lt;/script&gt;</pre>
+      </div>
+
+      <div class="snippet-group">
+        <p class="snippet-label">npm</p>
+        <pre data-vellum-ignore>npm i vellum
+
+import { mount } from "vellum";
+mount();</pre>
+      </div>
+    </section>
+
+    <!-- ── 6. Best practices ── -->
+    <section>
+      <h2>Best practices</h2>
+      <ul>
+        <li>Keep edits surgical — one fix per element.</li>
+        <li>Reset before switching tasks so the next agent prompt starts clean.</li>
+        <li>Use <strong>click-to-arm</strong> mode when reviewing read-heavy pages where you might fat-finger a heading.</li>
+        <li>Mark dynamic regions with <code>data-vellum-ignore</code> to keep them out of the edit set.</li>
+        <li>Trust the <strong>before</strong> text — agents grep for it. If it doesn't match the source, fix the markup, don't fight vellum.</li>
+      </ul>
+    </section>
+
+    <!-- ── 7. License ── -->
+    <section>
+      <h2>License</h2>
+      <p>MIT. Vellum is free for any use, including commercial. See <a href="LICENSE">LICENSE</a>.</p>
+    </section>
+
   </main>
+
+  <footer>
+    Built with vellum. The text on this page is editable — click anywhere.
+  </footer>
 
   <script src="./vellum.js"></script>
 </body>
