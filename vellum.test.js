@@ -177,3 +177,77 @@ test("Snapshot.hydrate replaces all entries from a serialized object", (t) => {
   assert.equal(Snapshot.get("b"), "two");
   assert.equal(Snapshot.get("c"), "three");
 });
+
+test("Output.markdown returns empty string for zero edits", (t) => {
+  const { internals } = loadVellum(t);
+  assert.equal(internals.Output.markdown([], { url: "x", pathname: "/x", viewport: "1x1" }), "");
+});
+
+test("Output.markdown formats a single edit", (t) => {
+  const { internals } = loadVellum(t);
+  const out = internals.Output.markdown(
+    [{ path: "main > h1", name: 'h1 "Pricing"', before: "Pricing", after: "Plans & pricing", removed: false }],
+    { url: "https://example.com/pricing", pathname: "/pricing", viewport: "1440×900" }
+  );
+  assert.match(out, /^# Vellum edits — \/pricing$/m);
+  assert.match(out, /\*\*URL:\*\* https:\/\/example\.com\/pricing/);
+  assert.match(out, /\*\*Viewport:\*\* 1440×900/);
+  assert.match(out, /\*\*Edits:\*\* 1/);
+  assert.match(out, /## 1\. h1 "Pricing"/);
+  assert.match(out, /\*\*Location:\*\* main > h1/);
+  assert.match(out, /\*\*Before:\*\*\nPricing/);
+  assert.match(out, /\*\*After:\*\*\nPlans & pricing/);
+});
+
+test("Output.markdown handles multiple edits with separate sections", (t) => {
+  const { internals } = loadVellum(t);
+  const out = internals.Output.markdown(
+    [
+      { path: "h1", name: 'h1 "A"', before: "A", after: "AA", removed: false },
+      { path: "p", name: 'paragraph: "B"', before: "B", after: "BB", removed: false },
+    ],
+    { url: "u", pathname: "/", viewport: "1x1" }
+  );
+  assert.match(out, /## 1\. h1 "A"/);
+  assert.match(out, /## 2\. paragraph: "B"/);
+  assert.match(out, /\*\*Edits:\*\* 2/);
+});
+
+test("Output.markdown emits Status for removed elements", (t) => {
+  const { internals } = loadVellum(t);
+  const out = internals.Output.markdown(
+    [{ path: "main > h1", name: "(removed)", before: "Gone", after: null, removed: true }],
+    { url: "u", pathname: "/", viewport: "1x1" }
+  );
+  assert.match(out, /\*\*Status:\*\* element no longer present/);
+  assert.doesNotMatch(out, /\*\*Location:\*\*/);
+  assert.match(out, /\*\*Before:\*\*\nGone/);
+});
+
+test("Output.markdown preserves multi-line before/after verbatim", (t) => {
+  const { internals } = loadVellum(t);
+  const before = "Line 1\nLine 2\nLine 3";
+  const after = "New 1\n\nNew 3";
+  const out = internals.Output.markdown(
+    [{ path: "p", name: "paragraph", before, after, removed: false }],
+    { url: "u", pathname: "/", viewport: "1x1" }
+  );
+  assert.match(out, /\*\*Before:\*\*\nLine 1\nLine 2\nLine 3/);
+  assert.match(out, /\*\*After:\*\*\nNew 1\n\nNew 3/);
+});
+
+test("Output.json produces stable shape", (t) => {
+  const { internals } = loadVellum(t);
+  const json = internals.Output.json(
+    [{ path: "h1", name: 'h1 "A"', before: "A", after: "AA", removed: false }],
+    { url: "u", pathname: "/", viewport: "1x1" }
+  );
+  const parsed = JSON.parse(json);
+  assert.equal(parsed.url, "u");
+  assert.equal(parsed.viewport, "1x1");
+  assert.equal(parsed.edits.length, 1);
+  assert.equal(parsed.edits[0].path, "h1");
+  assert.equal(parsed.edits[0].before, "A");
+  assert.equal(parsed.edits[0].after, "AA");
+  assert.equal(parsed.edits[0].removed, false);
+});

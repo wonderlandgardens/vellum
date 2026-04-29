@@ -117,7 +117,52 @@
 })();
   const Storage  = (() => { return {}; })();
   const Scanner  = (() => { return {}; })();
-  const Output   = (() => { return {}; })();
+  const Output   = (() => {
+  function markdown(edits, ctx) {
+    if (!edits || edits.length === 0) return "";
+    const lines = [];
+    lines.push(`# Vellum edits — ${ctx.pathname}`);
+    lines.push("");
+    lines.push(`**URL:** ${ctx.url}`);
+    lines.push(`**Viewport:** ${ctx.viewport}`);
+    lines.push(`**Edits:** ${edits.length}`);
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+    edits.forEach((e, i) => {
+      lines.push(`## ${i + 1}. ${e.name}`);
+      if (e.removed) {
+        lines.push(`**Status:** element no longer present`);
+      } else {
+        lines.push(`**Location:** ${e.path}`);
+      }
+      lines.push(`**Before:**`);
+      lines.push(e.before ?? "");
+      lines.push("");
+      lines.push(`**After:**`);
+      lines.push(e.after ?? "");
+      lines.push("");
+    });
+    return lines.join("\n").trimEnd();
+  }
+
+  function json(edits, ctx) {
+    return JSON.stringify({
+      url: ctx.url,
+      pathname: ctx.pathname,
+      viewport: ctx.viewport,
+      edits: edits.map((e) => ({
+        path: e.path,
+        name: e.name,
+        before: e.before,
+        after: e.after,
+        removed: !!e.removed,
+      })),
+    }, null, 2);
+  }
+
+  return { markdown, json };
+})();
   const Toolbar  = (() => { return {}; })();
 
   // Public API — populated as modules come online.
