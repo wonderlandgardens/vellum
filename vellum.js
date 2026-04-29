@@ -115,7 +115,65 @@
 
   return { capture, get, clear, all, hydrate, serialize };
 })();
-  const Storage  = (() => { return {}; })();
+  const Storage = (() => {
+  const PREFIX = "vellum:";
+  let unavailable = false;
+  let saveTimer = null;
+  let pendingPayload = null;
+
+  function key() {
+    const loc = window.location;
+    return `${PREFIX}${loc.origin}${loc.pathname}`;
+  }
+
+  function load() {
+    try {
+      const raw = window.localStorage.getItem(key());
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      unavailable = true;
+      return null;
+    }
+  }
+
+  function writeNow(payload) {
+    try {
+      window.localStorage.setItem(key(), JSON.stringify(payload));
+    } catch (e) {
+      unavailable = true;
+    }
+  }
+
+  function save(payload, { debounce = false } = {}) {
+    pendingPayload = payload;
+    if (!debounce) {
+      writeNow(payload);
+      return;
+    }
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      writeNow(pendingPayload);
+      saveTimer = null;
+    }, 200);
+  }
+
+  function clear() {
+    try {
+      window.localStorage.removeItem(key());
+    } catch (e) {
+      unavailable = true;
+    }
+  }
+
+  return {
+    key,
+    load,
+    save,
+    clear,
+    get unavailable() { return unavailable; },
+  };
+})();
   const Scanner  = (() => { return {}; })();
   const Output   = (() => {
   function markdown(edits, ctx) {

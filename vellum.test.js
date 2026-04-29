@@ -4,7 +4,7 @@ import { JSDOM } from "jsdom";
 import { readFileSync } from "node:fs";
 
 function loadVellum(t, html = "<!doctype html><html><body></body></html>") {
-  const dom = new JSDOM(html, { runScripts: "outside-only" });
+  const dom = new JSDOM(html, { runScripts: "outside-only", url: "https://example.com/" });
   dom.window.__VELLUM_TEST__ = true;
   globalThis.window = dom.window;
   globalThis.document = dom.window.document;
@@ -250,4 +250,44 @@ test("Output.json produces stable shape", (t) => {
   assert.equal(parsed.edits[0].before, "A");
   assert.equal(parsed.edits[0].after, "AA");
   assert.equal(parsed.edits[0].removed, false);
+});
+
+test("Storage.key includes origin and pathname", (t) => {
+  const { internals, window } = loadVellum(t);
+  // jsdom's location is non-configurable; replace globalThis.window with a plain
+  // object so Storage's `window.location` picks up our override.
+  globalThis.window = { location: { origin: "https://example.com", pathname: "/pricing" }, localStorage: window.localStorage };
+  assert.equal(internals.Storage.key(), "vellum:https://example.com/pricing");
+});
+
+test("Storage.save and load round-trip a payload", (t) => {
+  const { internals, window } = loadVellum(t);
+  globalThis.window = { location: { origin: "https://example.com", pathname: "/p" }, localStorage: window.localStorage };
+  internals.Storage.save({ edits: { "h1": "New" }, snapshots: { "h1": "Old" }, mode: "always-on" });
+  const loaded = internals.Storage.load();
+  assert.deepEqual(loaded.edits, { h1: "New" });
+  assert.deepEqual(loaded.snapshots, { h1: "Old" });
+  assert.equal(loaded.mode, "always-on");
+});
+
+test("Storage.load returns null when no entry exists", (t) => {
+  const { internals, window } = loadVellum(t);
+  globalThis.window = { location: { origin: "https://example.com", pathname: "/empty" }, localStorage: window.localStorage };
+  assert.equal(internals.Storage.load(), null);
+});
+
+test("Storage.clear removes the current key", (t) => {
+  const { internals, window } = loadVellum(t);
+  globalThis.window = { location: { origin: "https://example.com", pathname: "/p" }, localStorage: window.localStorage };
+  internals.Storage.save({ edits: { h1: "x" }, snapshots: {}, mode: "always-on" });
+  internals.Storage.clear();
+  assert.equal(internals.Storage.load(), null);
+});
+
+test("Storage.load returns null and reports unavailable on corrupt JSON", (t) => {
+  const { internals, window } = loadVellum(t);
+  globalThis.window = { location: { origin: "https://example.com", pathname: "/p" }, localStorage: window.localStorage };
+  globalThis.window.localStorage.setItem("vellum:https://example.com/p", "{not json");
+  assert.equal(internals.Storage.load(), null);
+  assert.equal(internals.Storage.unavailable, true);
 });
