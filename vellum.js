@@ -174,7 +174,136 @@
     get unavailable() { return unavailable; },
   };
 })();
-  const Scanner  = (() => { return {}; })();
+  const Scanner = (() => {
+  const EDITABLE_TAGS = new Set([
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "p", "li", "blockquote", "figcaption", "caption",
+    "dt", "dd", "td", "th",
+    "span", "a", "button", "label", "legend", "summary", "q", "cite",
+  ]);
+
+  const ARM_MARKER = "data-vellum-armed";
+  const originalHTMLCache = new WeakMap();
+  let mutationObserver = null;
+  let inputHandler = null;
+  let onEditCallback = null;
+  let toolbarHostRef = null;
+  let mode = "always-on";
+
+  function isInsideExcluded(el) {
+    let cur = el;
+    while (cur) {
+      const tag = cur.tagName?.toLowerCase();
+      if (tag === "head" || tag === "script" || tag === "style") return true;
+      if (cur === toolbarHostRef) return true;
+      if (cur.hasAttribute && cur.hasAttribute("data-vellum-ignore")) return true;
+      cur = cur.parentElement;
+    }
+    return false;
+  }
+
+  function hasOwnText(el) {
+    for (const child of el.childNodes) {
+      if (child.nodeType === 3 /* TEXT_NODE */ && child.nodeValue.trim() !== "") return true;
+    }
+    return false;
+  }
+
+  function isEditable(el) {
+    if (!el || !el.tagName) return false;
+    const tag = el.tagName.toLowerCase();
+    if (!EDITABLE_TAGS.has(tag)) return false;
+    if (el.getAttribute("contenteditable") === "false") return false;
+    if (isInsideExcluded(el)) return false;
+    if (!hasOwnText(el)) return false;
+    return true;
+  }
+
+  function armElement(el) {
+    if (el.hasAttribute(ARM_MARKER)) return;
+    el.setAttribute(ARM_MARKER, "");
+    el.setAttribute("contenteditable", "true");
+    originalHTMLCache.set(el, el.innerHTML);
+  }
+
+  function disarmElement(el) {
+    el.removeAttribute(ARM_MARKER);
+    el.removeAttribute("contenteditable");
+  }
+
+  function armAll() {
+    if (mode !== "always-on") return;
+    document.querySelectorAll("*").forEach((el) => {
+      if (isEditable(el)) armElement(el);
+    });
+  }
+
+  function disarmAll() {
+    document.querySelectorAll(`[${ARM_MARKER}]`).forEach(disarmElement);
+  }
+
+  function armOne(el) {
+    if (isEditable(el)) armElement(el);
+  }
+
+  function setMode(newMode) {
+    mode = newMode;
+    if (mode === "always-on") armAll();
+    else disarmAll();
+  }
+
+  function getOriginalHTML(el) {
+    return originalHTMLCache.get(el);
+  }
+
+  function init({ onEdit, toolbarHost, initialMode = "always-on" }) {
+    onEditCallback = onEdit;
+    toolbarHostRef = toolbarHost;
+    mode = initialMode;
+
+    inputHandler = (ev) => {
+      const target = ev.target;
+      if (!target || !target.hasAttribute || !target.hasAttribute(ARM_MARKER)) return;
+      onEditCallback?.(target);
+    };
+    document.addEventListener("input", inputHandler, true);
+
+    mutationObserver = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        m.addedNodes.forEach((n) => {
+          if (n.nodeType !== 1) return;
+          if (mode !== "always-on") return;
+          if (isEditable(n)) armElement(n);
+          n.querySelectorAll?.("*").forEach((child) => {
+            if (isEditable(child)) armElement(child);
+          });
+        });
+      }
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+    armAll();
+  }
+
+  function destroy() {
+    if (inputHandler) document.removeEventListener("input", inputHandler, true);
+    if (mutationObserver) mutationObserver.disconnect();
+    disarmAll();
+    inputHandler = null;
+    mutationObserver = null;
+  }
+
+  return {
+    init,
+    destroy,
+    armAll,
+    armOne,
+    disarmAll,
+    setMode,
+    getOriginalHTML,
+    isEditable,
+  };
+})();
   const Output   = (() => {
   function markdown(edits, ctx) {
     if (!edits || edits.length === 0) return "";
