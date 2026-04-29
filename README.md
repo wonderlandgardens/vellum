@@ -1,53 +1,91 @@
 # Vellum
 
-**An editable single-page diagram canvas.**
-Lay out boxes in plain HTML, connect them with [leader-line](https://github.com/anseki/leader-line), edit any text directly in the browser, and copy the result back as JSON to commit to your repo.
+**A drop-in overlay that makes any page's text editable.**
+Click. Edit. Copy as agent-ready markdown. Paste into your AI coding agent.
 
-No build step. No framework. One static `index.html` you can open from the filesystem.
+No build step. No framework. One static `vellum.js` you can load via a script tag, a bookmarklet, or `npm i`.
 
 ## Why
 
-SVG diagrams are great until you want to change a label. Vellum keeps the *boxes and arrows* aesthetic but makes every piece of text directly editable in the page — no Figma, no Illustrator, no SVG hand-editing.
+You're reviewing a page with an AI agent. You want to change a heading, fix a typo, rephrase a button. Describing each change in prose is slow and error-prone. Vellum lets you *make* the changes directly on the page, then exports a structured payload the agent uses to find-and-replace in source.
+
+## Install
+
+### Bookmarklet (works on any page)
+
+Drag this to your bookmarks bar:
+
+```
+javascript:(()=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/<owner>/vellum@main/vellum.js';document.head.appendChild(s);})()
+```
+
+Click it on any page to load vellum.
+
+### Script tag
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/<owner>/vellum@main/vellum.js"></script>
+```
+
+### npm
+
+```bash
+npm i vellum
+```
+
+```js
+import { mount } from "vellum";
+mount();                                      // anywhere
+useEffect(() => { mount(); }, []);            // React
+```
 
 ## Use
 
-```bash
-open index.html
+1. Vellum loads → small toolbar appears bottom-right.
+2. Click any text on the page → edit it inline.
+3. Click **Copy markdown** → paste into your AI coding agent with: *"apply these edits to the codebase."*
+4. **Reset** restores originals in place. No reload needed.
+
+Edits are saved to `localStorage` per `(origin + pathname)` so they survive refreshes and don't bleed across pages.
+
+## Output
+
+```markdown
+# Vellum edits — /pricing
+
+**URL:** https://example.com/pricing
+**Viewport:** 1440×900
+**Edits:** 1
+
+---
+
+## 1. h1 "Pricing"
+**Location:** main > section > h1
+**Before:**
+Pricing
+
+**After:**
+Plans & pricing
 ```
 
-That's it. The page loads with three example diagrams (modality columns, a stack-mapping comparison, and a knowledge-graph flow). Click any text to edit it. Edits are saved to `localStorage` automatically and survive refreshes.
+The agent gets a CSS selector path (for grepping markup) and the exact before/after text (for grepping copy).
 
-### Workflow
+## Configuration
 
-1. **Edit text** in any box. Auto-saved to `localStorage` as you type.
-2. **Copy as JSON** (button bottom-right) — copies all editable content, keyed by DOM path, to your clipboard.
-3. **Paste into your AI agent / a teammate / a PR** with the instruction: *"apply these edits to `index.html`"*. The DOM paths uniquely identify which line to change.
-4. **Reset edits** wipes `localStorage` and reloads the page.
+```html
+<script>window.VELLUM_MODE = "click-to-arm";</script>
+<script src="..."></script>
+```
 
-## How it works
+Modes:
+- `always-on` (default) — every text-bearing element is editable.
+- `click-to-arm` — nothing is editable until you click an element through the toolbar.
 
-- **Boxes**: plain HTML, styled with CSS Grid and `border` outlines.
-- **Connectors**: [leader-line](https://github.com/anseki/leader-line) draws SVG paths between two DOM nodes after layout. Repositioned automatically on `resize` and on `input` for any contenteditable element.
-- **Animation**: [anime.js](https://animejs.com/) staggers the box fade-in on load, then triggers leader-line's built-in `'draw'` effect on each connector.
-- **Editing**: HTML5 `contenteditable="true"` on every text node. No editor framework.
-- **Persistence**: `localStorage` keyed by index across all `[contenteditable="true"]` nodes.
+Opt elements out with `data-vellum-ignore` (applies to descendants too).
 
-## Customising
+## What it doesn't do
 
-Open `index.html` and edit the markup directly. Three sections to know:
-
-| Section | What it controls |
-|---|---|
-| `<style>` | colour palette via CSS variables (`--ink`, `--paper`, etc.), box styling, layout grids |
-| `<main>` | the diagrams themselves — each `<article class="diagram">` is one. IDs on boxes are referenced by leader-line. |
-| `<script>` (`buildLines`) | which boxes connect to which, plus per-line options (path shape, dash, label, socket gravity) |
-
-To add a new connection between two existing boxes: give them `id`s, then add a `connect('source-id', 'target-id')` call inside `buildLines()`.
-
-## Credits
-
-- [leader-line-new](https://github.com/anseki/leader-line) — SVG arrow drawing between DOM nodes
-- [anime.js](https://animejs.com/) — entrance animations
+Vellum is text-only. It doesn't capture screenshots, computed styles, accessibility info, React component locations, or visual annotations. For those, use [agentation](https://github.com/benjitaylor/agentation).
 
 ## License
 
