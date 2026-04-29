@@ -19,22 +19,13 @@ function loadVellum(t, html = "<!doctype html><html><body></body></html>") {
   });
 
   const code = readFileSync(new URL("./vellum.js", import.meta.url), "utf-8");
-  dom.window.eval(code);
-
-  const internals = dom.window.__vellumInternals;
-  // Node 22 deepStrictEqual checks prototype identity across realms.
-  // Wrap Snapshot.all to deserialize through JSON so returned objects
-  // live in the host realm and pass strict equality checks.
-  if (internals?.Snapshot?.all) {
-    const _all = internals.Snapshot.all.bind(internals.Snapshot);
-    internals.Snapshot.all = () => JSON.parse(JSON.stringify(_all()));
-  }
+  eval(code);
 
   return {
     dom,
     window: dom.window,
     document: dom.window.document,
-    internals,
+    internals: globalThis.__vellumInternals,
   };
 }
 
