@@ -25,6 +25,8 @@
   if (typeof window !== "undefined") {
     window.Vellum = Vellum;
 
+    // Only the four pure modules are exposed for unit testing; Scanner and
+    // Toolbar have DOM side effects and are smoke-tested via index.html.
     if (globalThis.__VELLUM_TEST__ || (typeof window !== "undefined" && window.__VELLUM_TEST__)) {
       globalThis.__vellumInternals = { Selector, Snapshot, Storage, Output };
     }
