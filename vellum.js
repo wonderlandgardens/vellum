@@ -350,7 +350,124 @@
 
   return { markdown, json };
 })();
-  const Toolbar  = (() => { return {}; })();
+  const Toolbar = (() => {
+  let host = null;
+  let shadow = null;
+  let countEl = null;
+  let modeBtn = null;
+  let onCopyMd = null;
+  let onCopyJson = null;
+  let onReset = null;
+  let onModeChange = null;
+  let currentMode = "always-on";
+
+  const STYLES = `
+    :host { all: initial; }
+    .panel {
+      position: fixed; bottom: 16px; right: 16px;
+      z-index: 2147483647;
+      display: flex; gap: 6px; align-items: center;
+      font: 12px/1.4 -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      background: #111; color: #fff;
+      padding: 6px 8px; border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    }
+    .panel button {
+      font: inherit; color: #fff;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 5px; padding: 4px 8px;
+      cursor: pointer;
+    }
+    .panel button:hover { background: rgba(255,255,255,0.16); }
+    .count {
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px; padding: 2px 8px;
+    }
+    .badge-warn {
+      background: #b45309; padding: 2px 6px; border-radius: 4px;
+      font-size: 11px;
+    }
+  `;
+
+  function mount(opts) {
+    onCopyMd = opts.onCopyMarkdown;
+    onCopyJson = opts.onCopyJson;
+    onReset = opts.onReset;
+    onModeChange = opts.onModeChange;
+    currentMode = opts.initialMode || "always-on";
+
+    host = document.createElement("div");
+    host.setAttribute("data-vellum-toolbar", "");
+    shadow = host.attachShadow({ mode: "closed" });
+
+    const style = document.createElement("style");
+    style.textContent = STYLES;
+    shadow.appendChild(style);
+
+    const panel = document.createElement("div");
+    panel.className = "panel";
+
+    countEl = document.createElement("span");
+    countEl.className = "count";
+    countEl.textContent = "0 edits";
+    panel.appendChild(countEl);
+
+    const copyMd = document.createElement("button");
+    copyMd.textContent = "Copy markdown";
+    copyMd.addEventListener("click", () => onCopyMd?.());
+    panel.appendChild(copyMd);
+
+    const copyJson = document.createElement("button");
+    copyJson.textContent = "Copy JSON";
+    copyJson.addEventListener("click", () => onCopyJson?.());
+    panel.appendChild(copyJson);
+
+    const resetBtn = document.createElement("button");
+    resetBtn.textContent = "Reset";
+    resetBtn.addEventListener("click", () => onReset?.());
+    panel.appendChild(resetBtn);
+
+    modeBtn = document.createElement("button");
+    modeBtn.textContent = currentMode === "always-on" ? "Mode: always-on" : "Mode: click-to-arm";
+    modeBtn.addEventListener("click", () => {
+      currentMode = currentMode === "always-on" ? "click-to-arm" : "always-on";
+      modeBtn.textContent = currentMode === "always-on" ? "Mode: always-on" : "Mode: click-to-arm";
+      onModeChange?.(currentMode);
+    });
+    panel.appendChild(modeBtn);
+
+    shadow.appendChild(panel);
+    document.body.appendChild(host);
+
+    return host;
+  }
+
+  function flash(count) {
+    if (countEl) countEl.textContent = `${count} edit${count === 1 ? "" : "s"}`;
+  }
+
+  function showStorageBadge() {
+    if (!shadow) return;
+    if (shadow.querySelector(".badge-warn")) return;
+    const badge = document.createElement("span");
+    badge.className = "badge-warn";
+    badge.textContent = "storage unavailable";
+    shadow.querySelector(".panel").prepend(badge);
+  }
+
+  function unmount() {
+    if (host && host.parentNode) host.parentNode.removeChild(host);
+    host = null;
+    shadow = null;
+  }
+
+  function getHost() {
+    return host;
+  }
+
+  return { mount, flash, unmount, getHost, showStorageBadge };
+})();
 
   // Public API — populated as modules come online.
   const Vellum = {
