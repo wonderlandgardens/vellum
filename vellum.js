@@ -479,6 +479,15 @@
       background: #b45309; padding: 2px 6px; border-radius: 4px;
       font-size: 11px;
     }
+    .panel button.icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 6px;
+    }
+    .panel button.icon svg {
+      display: block;
+    }
   `;
 
   async function withCopyFeedback(btn, fn) {
@@ -528,7 +537,16 @@
     panel.appendChild(copyJsonBtn);
 
     resetBtnRef = document.createElement("button");
-    resetBtnRef.textContent = "Reset";
+    resetBtnRef.className = "icon";
+    resetBtnRef.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <polyline points="3 6 5 6 21 6"></polyline>
+  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+  <path d="M10 11v6"></path>
+  <path d="M14 11v6"></path>
+  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+</svg>`;
+    resetBtnRef.setAttribute("aria-label", "Discard edits and restore originals");
+    resetBtnRef.setAttribute("title", "Discard edits and restore originals");
     resetBtnRef.addEventListener("click", () => {
       onReset?.();
       if (countEl) {
