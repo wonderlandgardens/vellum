@@ -21,11 +21,20 @@ function loadVellum(t, html = "<!doctype html><html><body></body></html>") {
   const code = readFileSync(new URL("./vellum.js", import.meta.url), "utf-8");
   dom.window.eval(code);
 
+  const internals = dom.window.__vellumInternals;
+  // Node 22 deepStrictEqual checks prototype identity across realms.
+  // Wrap Snapshot.all to deserialize through JSON so returned objects
+  // live in the host realm and pass strict equality checks.
+  if (internals?.Snapshot?.all) {
+    const _all = internals.Snapshot.all.bind(internals.Snapshot);
+    internals.Snapshot.all = () => JSON.parse(JSON.stringify(_all()));
+  }
+
   return {
     dom,
     window: dom.window,
     document: dom.window.document,
-    internals: dom.window.__vellumInternals,
+    internals,
   };
 }
 
@@ -127,4 +136,53 @@ test("nameOf produces tag-aware human-readable names", (t) => {
   assert.equal(internals.Selector.nameOf(document.querySelector("li")), 'list item: "First entry"');
   assert.equal(internals.Selector.nameOf(document.querySelector("code")), 'code: `npm install`');
   assert.equal(internals.Selector.nameOf(document.querySelector("span")), '"label"');
+});
+
+test("Snapshot.capture stores original only on first call per path", (t) => {
+  const { internals } = loadVellum(t);
+  const Snapshot = internals.Snapshot;
+  Snapshot.capture("main > h1", "Original");
+  Snapshot.capture("main > h1", "Modified");      // should be ignored
+  assert.equal(Snapshot.get("main > h1"), "Original");
+});
+
+test("Snapshot.capture stores independent values per path", (t) => {
+  const { internals } = loadVellum(t);
+  const Snapshot = internals.Snapshot;
+  Snapshot.capture("a", "one");
+  Snapshot.capture("b", "two");
+  assert.equal(Snapshot.get("a"), "one");
+  assert.equal(Snapshot.get("b"), "two");
+});
+
+test("Snapshot.all returns one entry per captured path", (t) => {
+  const { internals } = loadVellum(t);
+  const Snapshot = internals.Snapshot;
+  Snapshot.capture("a", "one");
+  Snapshot.capture("b", "two");
+  const all = Snapshot.all();
+  assert.equal(all.length, 2);
+  assert.deepEqual(
+    all.sort((x, y) => x.path.localeCompare(y.path)),
+    [{ path: "a", before: "one" }, { path: "b", before: "two" }]
+  );
+});
+
+test("Snapshot.clear empties the store", (t) => {
+  const { internals } = loadVellum(t);
+  const Snapshot = internals.Snapshot;
+  Snapshot.capture("a", "one");
+  Snapshot.clear();
+  assert.equal(Snapshot.get("a"), undefined);
+  assert.equal(Snapshot.all().length, 0);
+});
+
+test("Snapshot.hydrate replaces all entries from a serialized object", (t) => {
+  const { internals } = loadVellum(t);
+  const Snapshot = internals.Snapshot;
+  Snapshot.capture("a", "one");
+  Snapshot.hydrate({ b: "two", c: "three" });
+  assert.equal(Snapshot.get("a"), undefined);
+  assert.equal(Snapshot.get("b"), "two");
+  assert.equal(Snapshot.get("c"), "three");
 });

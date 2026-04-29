@@ -86,7 +86,35 @@
 
   return { pathOf, nameOf };
 })();
-  const Snapshot = (() => { return {}; })();
+  const Snapshot = (() => {
+  let store = new Map();
+
+  function capture(path, originalHTML) {
+    if (!store.has(path)) store.set(path, originalHTML);
+  }
+
+  function get(path) {
+    return store.get(path);
+  }
+
+  function clear() {
+    store = new Map();
+  }
+
+  function all() {
+    return Array.from(store.entries()).map(([path, before]) => ({ path, before }));
+  }
+
+  function hydrate(obj) {
+    store = new Map(Object.entries(obj || {}));
+  }
+
+  function serialize() {
+    return Object.fromEntries(store);
+  }
+
+  return { capture, get, clear, all, hydrate, serialize };
+})();
   const Storage  = (() => { return {}; })();
   const Scanner  = (() => { return {}; })();
   const Output   = (() => { return {}; })();
